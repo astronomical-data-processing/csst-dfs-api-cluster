@@ -1,0 +1,4 @@
+astropy
+grpc
+orjson
+git+https://github.com/astronomical-data-processing/csst-dfs-proto-py.git
