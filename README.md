@@ -1,17 +1,17 @@
-# CSST local APIs library
+# CSST Cluster APIs library
 
 ## Introduction
 
-This package provides APIs to access csst's files and databases in your localized environment.
+This package provides APIs to access csst's files and databases.
 
 ## Installation
 
 This library can be installed with the following command: 
 
 ```bash
-python setup.py install
+pip install git+https://github.com/astronomical-data-processing/csst-dfs-api-cluster.git
 ```
 
 ## Configuration
 set enviroment variable
-    CSST_LOCAL_FILE_ROOT = [a local file directory] #default: /opt/temp/csst
+    CSST_DFS_CONFIG_SERVER = ip:port
