@@ -1,13 +1,12 @@
-from ..common.client_config import ClientConfigurator
-from ..common.service import ServiceProxy
-
-from csst_dfs_proto.common.ephem import ephem_pb2, ephem_pb2_grpc
-from ..common.constants import *
 import grpc
+from csst_dfs_commons.models import Result
+from csst_dfs_proto.common.ephem import ephem_pb2, ephem_pb2_grpc
+from ..common.service import ServiceProxy
+from ..common.constants import *
 
 class CatalogApi(object):
     def __init__(self):
-        self.proxy = ServiceProxy(ClientConfigurator().gatewayCfg)
+        self.proxy = ServiceProxy()
         self.stub = self.proxy.insecure(ephem_pb2_grpc.EphemSearchSrvStub)
     
     def gaia3_query(self, ra: float, dec: float, radius: float, min_mag: float,  max_mag: float,  obstime: int, limit: int):
@@ -32,8 +31,12 @@ class CatalogApi(object):
                 obstime = obstime,
                 limit = limit
             ))
-            return resp
 
-        except grpc.RpcError as identifier:
-            raise Exception("Rpc Error")
+            if resp.success:
+                return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)
+            else:
+                return Result.error(message = resp.message)
+
+        except grpc.RpcError as e:
+            return Result.error(message="%s:%s" % (e.code().value, e.details))
 

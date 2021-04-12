@@ -2,7 +2,6 @@
 import os
 import grpc
 
-from ..common.client_config import ClientConfigurator
 from ..common.service import ServiceProxy
 from ..common.utils import *
 from ..common.constants import *

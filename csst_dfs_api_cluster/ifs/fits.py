@@ -3,7 +3,6 @@ import grpc
 
 from csst_dfs_proto.ifs.fits import fits_pb2, fits_pb2_grpc
 
-from ..common.client_config import ClientConfigurator
 from ..common.service import ServiceProxy
 from ..common.utils import *
 from ..common.constants import UPLOAD_CHUNK_SIZE
@@ -11,7 +10,7 @@ from ..common.constants import UPLOAD_CHUNK_SIZE
 class FitsApi(object):
     def __init__(self, sub_system = "ifs"):
         self.sub_system = sub_system
-        self.proxy = ServiceProxy(ClientConfigurator().gatewayCfg)
+        self.proxy = ServiceProxy()
         self.stub = self.proxy.insecure(fits_pb2_grpc.FitsSrvStub)
 
     def find(self, **kwargs):

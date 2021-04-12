@@ -9,14 +9,18 @@ class IFSFitsTestCase(unittest.TestCase):
     def setUp(self):
         self.api = FitsApi()
 
-    def test_find(self):
-        recs = self.api.find(file_name='CCD1_ObsTime_300_ObsNum_7.fits')
-        print('find:', recs)
-        assert len(recs) == 1
+    # def test_find(self):
+    #     recs = self.api.find(file_name='CCD1_ObsTime_300_ObsNum_7.fits')
+    #     print('find:', recs)
+    #     assert len(recs) == 1
 
-        recs = self.api.find()
-        print('find:', recs)
-        assert len(recs) > 1
+    #     recs = self.api.find()
+    #     print('find:', recs)
+    #     assert len(recs) > 1
+
+    def test_get(self):
+        rec = self.api.get(fits_id=0)
+        print('get:', rec)
 
     # def test_read(self):
     #     recs = self.api.find(file_name='CCD1_ObsTime_300_ObsNum_7.fits')

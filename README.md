@@ -9,10 +9,13 @@ This package provides APIs to access csst's files and databases.
 This library can be installed with the following command: 
 
 ```bash
-pip install git+https://github.com/astronomical-data-processing/csst-dfs-api-cluster.git
+git clone https://github.com/astronomical-data-processing/csst-dfs-api-cluster.git
+cd csst-dfs-api-cluster
+pip install -r requirements.txt
+python setup.py install
 ```
 
 ## Configuration
 set enviroment variable
 
-    CSST_DFS_CONFIG_SERVER = ip:port
+    CSST_DFS_GATEWAY = ip:port
