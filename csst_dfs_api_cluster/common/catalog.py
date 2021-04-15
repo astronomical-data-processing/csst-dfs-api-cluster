@@ -1,13 +1,13 @@
 import grpc
 from csst_dfs_commons.models import Result
 from csst_dfs_proto.common.ephem import ephem_pb2, ephem_pb2_grpc
-from ..common.service import ServiceProxy
-from ..common.constants import *
+from .service import ServiceProxy
+from .constants import *
+from .utils import get_auth_headers
 
 class CatalogApi(object):
     def __init__(self):
-        self.proxy = ServiceProxy()
-        self.stub = self.proxy.insecure(ephem_pb2_grpc.EphemSearchSrvStub)
+        self.stub = ephem_pb2_grpc.EphemSearchSrvStub(ServiceProxy().channel())
     
     def gaia3_query(self, ra: float, dec: float, radius: float, min_mag: float,  max_mag: float,  obstime: int, limit: int):
         ''' retrieval GAIA DR 3
@@ -19,10 +19,11 @@ class CatalogApi(object):
                 max_mag: maximal magnitude
                 obstime: seconds  
                 limit: limits returns the number of records
-            return: a dict as {success: true, totalCount: 100, records:[.....]}
+            return: csst_dfs_common.models.Result
         ''' 
         try:
-            resp = self.stub.Gaia3Search(ephem_pb2.EphemSearchRequest(
+            
+            resp, _ = self.stub.Gaia3Search.with_call(ephem_pb2.EphemSearchRequest(
                 ra = ra,
                 dec = dec,
                 radius = radius,
@@ -30,7 +31,7 @@ class CatalogApi(object):
                 maxMag = max_mag,
                 obstime = obstime,
                 limit = limit
-            ))
+            ),metadata = get_auth_headers())
 
             if resp.success:
                 return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)

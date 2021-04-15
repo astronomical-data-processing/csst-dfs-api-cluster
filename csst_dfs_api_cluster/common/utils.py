@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 import time
 
@@ -48,3 +49,6 @@ def singleton(cls):
             _instance[cls] = cls()
         return _instance[cls]
     return inner
+
+def get_auth_headers():
+    return (("csst_dfs_app",os.getenv("CSST_DFS_APP_ID")),("csst_dfs_token",os.getenv("CSST_DFS_APP_TOKEN")),)

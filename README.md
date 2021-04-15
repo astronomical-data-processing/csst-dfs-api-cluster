@@ -16,6 +16,8 @@ python setup.py install
 ```
 
 ## Configuration
-set enviroment variable
+set enviroment variables
 
-    CSST_DFS_GATEWAY = ip:port
+* CSST_DFS_GATEWAY = ip:port
+* CSST_DFS_APP = 
+* CSST_DFS_TOKEN = 
