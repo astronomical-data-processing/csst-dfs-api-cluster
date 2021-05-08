@@ -1,5 +1,6 @@
 astropy>=4.0
 grpcio>=1.28.1
 orjson>=3.0.2
+protobuf==3.9.0
 git+https://github.com/astronomical-data-processing/csst-dfs-proto-py.git
 git+https://github.com/astronomical-data-processing/csst-dfs-commons.git
