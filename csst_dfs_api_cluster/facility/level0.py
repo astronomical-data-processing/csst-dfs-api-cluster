@@ -17,7 +17,7 @@ class Level0DataApi(object):
             obs_id: [int]
             detector_no: [str]
             obs_type: [str]
-            exp_time : (start, end),
+            obs_time : (start, end),
             qc0_status : [int],
             prc_status : [int],
             file_name: [str]
@@ -30,8 +30,8 @@ class Level0DataApi(object):
                 obs_id = get_parameter(kwargs, "obs_id"),
                 detector_no = get_parameter(kwargs, "detector_no"),
                 obs_type = get_parameter(kwargs, "obs_type"),
-                exp_time_start = get_parameter(kwargs, "exp_time", [None, None])[0],
-                exp_time_end = get_parameter(kwargs, "exp_time", [None, None])[1],
+                exp_time_start = get_parameter(kwargs, "obs_time", [None, None])[0],
+                exp_time_end = get_parameter(kwargs, "obs_time", [None, None])[1],
                 qc0_status = get_parameter(kwargs, "qc0_status"),
                 prc_status = get_parameter(kwargs, "prc_status"),
                 file_name = get_parameter(kwargs, "file_name"),
@@ -42,7 +42,7 @@ class Level0DataApi(object):
             if resp.success:
                 return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)
             else:
-                return Result.error(message = resp.message)
+                return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))
@@ -68,29 +68,6 @@ class Level0DataApi(object):
            
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))   
-
-    def read(self, **kwargs):
-        ''' yield bytes of fits file
-
-        parameter kwargs:
-            fits_id = [int],
-            file_path = [str], 
-            chunk_size = [int] default 20480
-
-        yield bytes of fits file
-        '''
-        try:
-            streams = self.stub.Read.with_call(level0_pb2.ReadLevel0DatasReq(
-                id = get_parameter(kwargs, "fits_id"),
-                file_path = get_parameter(kwargs, "file_path"),
-                chunk_size = get_parameter(kwargs, "chunk_size", 20480)
-            ),metadata = get_auth_headers())
-
-            for stream in streams:
-                yield stream.data
-
-        except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
 
     def update_proc_status(self, **kwargs):
         ''' update the status of reduction
@@ -136,5 +113,39 @@ class Level0DataApi(object):
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))
 
+    def write(self, **kwargs):
+        ''' insert a level0 data record into database
+ 
+        parameter kwargs:
+            obs_id = [int]
+            detector_no = [str]
+            obs_type = [str]        
+            obs_time = [str]
+            exp_time = [int]
+            detector_status_id = [int]
+            filename = [str]
+            file_path = [str]
+        return: csst_dfs_common.models.Result
+        '''          
+        rec = level0_pb2.Level0Record(
+            obs_id = get_parameter(kwargs, "obs_id"),
+            detector_no = get_parameter(kwargs, "detector_no"),
+            obs_type = get_parameter(kwargs, "obs_type"),
+            obs_time = get_parameter(kwargs, "obs_time"),
+            exp_time = get_parameter(kwargs, "exp_time"),
+            detector_status_id = get_parameter(kwargs, "detector_status_id"),
+            filename = get_parameter(kwargs, "filename"),
+            file_path = get_parameter(kwargs, "file_path")
+        )
+        req = level0_pb2.WriteLevel0DataReq(record = rec)
+        try:
+            resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
+            if resp.success:
+                return Result.ok_data(data=resp.record)
+            else:
+                return Result.error(message = str(resp.error.detail))
+    
+        except grpc.RpcError as e:
+            return Result.error(message="%s:%s" % (e.code().value, e.details))
 
 

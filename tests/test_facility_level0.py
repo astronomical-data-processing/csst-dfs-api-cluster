@@ -24,3 +24,15 @@ class Level0DataTestCase(unittest.TestCase):
     def test_update_qc0_status(self):
         rec = self.api.update_qc0_status(fits_id = 100, status = 7)
         print('update_qc0_status:', rec)
+
+    def test_write(self):
+        rec = self.api.write(
+            obs_id = 13,
+            detector_no = "CCD01",
+            obs_type = "sci",            
+            obs_time = "2021-06-06 11:12:13",
+            exp_time = 150,
+            detector_status_id = 3,
+            filename = "MSC_00001234",
+            file_path = "/opt/MSC_00001234.fits")
+        print('write:', rec)  

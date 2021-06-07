@@ -33,7 +33,7 @@ class Level0PrcApi(object):
             if resp.success:
                 return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)
             else:
-                return Result.error(message = resp.message)
+                return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))
@@ -42,7 +42,7 @@ class Level0PrcApi(object):
         ''' update the status of reduction
 
         parameter kwargs:
-            obs_id : [int],
+            id : [int],
             status : [int]
 
         return csst_dfs_common.models.Result

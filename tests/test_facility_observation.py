@@ -24,3 +24,13 @@ class FacilityObservationTestCase(unittest.TestCase):
     def test_update_qc0_status(self):
         rec = self.api.update_qc0_status(obs_id = 9, status = 3, )
         print('update_qc0_status:', rec)        
+
+    def test_write(self):
+        rec = self.api.write(
+            obs_time = "2021-06-06 11:12:13",
+            exp_time = 150,
+            module_id = "MSC",
+            obs_type = "sci",
+            facility_status_id = 3,
+            module_status_id = 3)
+        print('write:', rec)        

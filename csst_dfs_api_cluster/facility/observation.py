@@ -8,6 +8,9 @@ from ..common.utils import *
 from ..common.constants import UPLOAD_CHUNK_SIZE
 
 class ObservationApi(object):
+    """
+    Observation Operation Class
+    """    
     def __init__(self):
         self.stub = observation_pb2_grpc.ObservationSrvStub(ServiceProxy().channel())
 
@@ -17,7 +20,7 @@ class ObservationApi(object):
         parameter kwargs:
             module_id: [str]
             obs_type: [str]
-            exp_time : (start, end),
+            obs_time : (start, end),
             qc0_status : [int],
             prc_status : [int],
             limit: limits returns the number of records,default 0:no-limit
@@ -28,8 +31,8 @@ class ObservationApi(object):
             resp, _ =  self.stub.Find.with_call(observation_pb2.FindObservationReq(
                 module_id = get_parameter(kwargs, "module_id"),
                 obs_type = get_parameter(kwargs, "obs_type"),
-                exp_time_start = get_parameter(kwargs, "exp_time", [None, None])[0],
-                exp_time_end = get_parameter(kwargs, "exp_time", [None, None])[1],
+                exp_time_start = get_parameter(kwargs, "obs_time", [None, None])[0],
+                exp_time_end = get_parameter(kwargs, "obs_time", [None, None])[1],
                 qc0_status = get_parameter(kwargs, "qc0_status"),
                 prc_status = get_parameter(kwargs, "prc_status"),
                 limit = get_parameter(kwargs, "limit", 0),
@@ -114,22 +117,24 @@ class ObservationApi(object):
         ''' insert a observational record into database
  
         parameter kwargs:
-            file_path : [str]
+            obs_time = [str]
+            exp_time = [int]
+            module_id = [str]
+            obs_type = [str]
+            facility_status_id = [int]
+            module_status_id = [int]
+        return: csst_dfs_common.models.Result
         '''   
-        exp_begin_time = get_parameter(kwargs, "exp_begin_time")
-        exp_end_time = get_parameter(kwargs, "exp_end_time")
-        module_id = get_parameter(kwargs, "module_id")
-        obs_type = get_parameter(kwargs, "obs_type")
-        facility_status_id = get_parameter(kwargs, "facility_status_id")
-        module_status_id = get_parameter(kwargs, "module_status_id")
 
-        req = observation_pb2.WriteObservationReq(
-                                    exp_begin_time=exp_begin_time, 
-                                    exp_end_time=exp_end_time, 
-                                    module_id=module_id, 
-                                    obs_type=obs_type, 
-                                    facility_status_id=facility_status_id, 
-                                    module_status_id=module_status_id)
+        rec = observation_pb2.Observation(
+            obs_time = get_parameter(kwargs, "obs_time"),
+            exp_time = get_parameter(kwargs, "exp_time"),
+            module_id = get_parameter(kwargs, "module_id"),
+            obs_type = get_parameter(kwargs, "obs_type"),
+            facility_status_id = get_parameter(kwargs, "facility_status_id"),
+            module_status_id = get_parameter(kwargs, "module_status_id")
+        )
+        req = observation_pb2.WriteObservationReq(record = rec)
         try:
             resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
             if resp.success:

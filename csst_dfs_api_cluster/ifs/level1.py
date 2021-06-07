@@ -1,7 +1,7 @@
 import grpc
 
 from csst_dfs_commons.models import Result
-from csst_dfs_proto.msc.level1 import level1_pb2, level1_pb2_grpc
+from csst_dfs_proto.ifs.level1 import level1_pb2, level1_pb2_grpc
 
 from ..common.service import ServiceProxy
 from ..common.utils import *
@@ -126,6 +126,9 @@ class Level1DataApi(object):
             flat_id : [int]
             dark_id : [int]
             bias_id : [int]
+            lamp_id : [int]
+            arc_id : [int]
+            sky_id : [int]            
             filename : [str]
             file_path : [str]            
             prc_status : [int]
@@ -144,6 +147,9 @@ class Level1DataApi(object):
             flat_id = get_parameter(kwargs, "flat_id"),
             dark_id = get_parameter(kwargs, "dark_id"),
             bias_id = get_parameter(kwargs, "bias_id"),
+            lamp_id = get_parameter(kwargs, "lamp_id"),
+            arc_id = get_parameter(kwargs, "arc_id"),
+            sky_id = get_parameter(kwargs, "sky_id"),
             filename = get_parameter(kwargs, "filename"),
             file_path = get_parameter(kwargs, "file_path"),
             prc_status = get_parameter(kwargs, "prc_status"),

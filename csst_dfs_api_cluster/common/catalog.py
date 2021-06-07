@@ -36,7 +36,7 @@ class CatalogApi(object):
             if resp.success:
                 return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)
             else:
-                return Result.error(message = resp.message)
+                return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))
