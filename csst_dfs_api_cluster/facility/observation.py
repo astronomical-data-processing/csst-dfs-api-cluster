@@ -1,6 +1,9 @@
 import grpc
 
 from csst_dfs_commons.models import Result
+from csst_dfs_commons.models.common import from_proto_model_list
+from csst_dfs_commons.models.facility import Observation
+
 from csst_dfs_proto.facility.observation import observation_pb2, observation_pb2_grpc
 
 from ..common.service import ServiceProxy
@@ -40,7 +43,7 @@ class ObservationApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
-                return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)
+                return Result.ok_data(data = from_proto_model_list(Observation, resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
@@ -61,10 +64,10 @@ class ObservationApi(object):
                 obs_id = obs_id
             ),metadata = get_auth_headers())
 
-            if resp.observation is None:
+            if resp.observation is None or resp.observation.id == 0:
                 return Result.error(message=f"obs_id:{obs_id} not found")  
 
-            return Result.ok_data(data=resp.observation)
+            return Result.ok_data(data=Observation.from_proto_model(resp.observation))
            
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))        
@@ -138,7 +141,7 @@ class ObservationApi(object):
         try:
             resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data=resp.record)
+                return Result.ok_data(data=Observation.from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
     

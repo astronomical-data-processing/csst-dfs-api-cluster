@@ -1,6 +1,9 @@
 import grpc
 
 from csst_dfs_commons.models import Result
+from csst_dfs_commons.models.common import from_proto_model_list
+from csst_dfs_commons.models.facility import Detector, DetectorStatus
+
 from csst_dfs_proto.facility.detector import detector_pb2, detector_pb2_grpc
 
 from ..common.service import ServiceProxy
@@ -26,7 +29,7 @@ class DetectorApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
-                return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)
+                return Result.ok_data(data=from_proto_model_list(Detector,resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
@@ -50,7 +53,7 @@ class DetectorApi(object):
             if not resp.record.no:
                 return Result.error(message=f"no:{no} not found")  
 
-            return Result.ok_data(data=resp.record)
+            return Result.ok_data(data=Detector().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))   
@@ -132,7 +135,7 @@ class DetectorApi(object):
         try:
             resp,_ = self.stub.Write.with_call(req, metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data=resp.record)
+                return Result.ok_data(data=Detector().from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
@@ -157,7 +160,7 @@ class DetectorApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
-                return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)
+                return Result.ok_data(data=from_proto_model_list(DetectorStatus,resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
@@ -178,10 +181,10 @@ class DetectorApi(object):
                 id = id
             ),metadata = get_auth_headers())
 
-            if resp.record is None:
+            if resp.record == 0:
                 return Result.error(message=f"id:{id} not found")  
 
-            return Result.ok_data(data=resp.record)
+            return Result.ok_data(data=DetectorStatus().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))   
@@ -206,7 +209,7 @@ class DetectorApi(object):
         try:
             resp,_ = self.stub.WriteStatus.with_call(req, metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data=resp.record)
+                return Result.ok_data(data=DetectorStatus().from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:

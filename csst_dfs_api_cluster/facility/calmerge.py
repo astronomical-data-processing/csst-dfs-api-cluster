@@ -1,6 +1,9 @@
 import grpc
 
 from csst_dfs_commons.models import Result
+from csst_dfs_commons.models.common import from_proto_model_list
+from csst_dfs_commons.models.facility import CalMergeRecord
+
 from csst_dfs_proto.facility.calmerge import calmerge_pb2, calmerge_pb2_grpc
 
 from ..common.service import ServiceProxy
@@ -38,7 +41,7 @@ class CalMergeApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
-                return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)
+                return Result.ok_data(data=from_proto_model_list(CalMergeRecord,resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
@@ -59,10 +62,10 @@ class CalMergeApi(object):
                 id = id
             ),metadata = get_auth_headers())
 
-            if resp.record is None:
+            if resp.record.id == 0:
                 return Result.error(message=f"id:{id} not found")  
 
-            return Result.ok_data(data=resp.record)
+            return Result.ok_data(data=CalMergeRecord().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))   
@@ -148,7 +151,7 @@ class CalMergeApi(object):
         try:
             resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data=resp.record)
+                return Result.ok_data(data=CalMergeRecord().from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:

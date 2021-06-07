@@ -1,6 +1,9 @@
 import grpc
 
 from csst_dfs_commons.models import Result
+from csst_dfs_commons.models.common import from_proto_model_list
+from csst_dfs_commons.models.facility import Level0PrcRecord
+
 from csst_dfs_proto.facility.level0prc import level0prc_pb2, level0prc_pb2_grpc
 
 from ..common.service import ServiceProxy
@@ -31,7 +34,7 @@ class Level0PrcApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
-                return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)
+                return Result.ok_data(data = from_proto_model_list(Level0PrcRecord, resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
@@ -90,7 +93,7 @@ class Level0PrcApi(object):
         try:
             resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data=resp.record)
+                return Result.ok_data(data = Level0PrcRecord.from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:

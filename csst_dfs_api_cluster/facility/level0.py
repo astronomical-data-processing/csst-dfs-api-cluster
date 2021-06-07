@@ -1,6 +1,9 @@
 import grpc
 
 from csst_dfs_commons.models import Result
+from csst_dfs_commons.models.common import from_proto_model_list
+from csst_dfs_commons.models.facility import Level0Record
+
 from csst_dfs_proto.facility.level0 import level0_pb2, level0_pb2_grpc
 
 from ..common.service import ServiceProxy
@@ -40,7 +43,7 @@ class Level0DataApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
-                return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)
+                return Result.ok_data(data=from_proto_model_list(Level0Record, resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
@@ -61,10 +64,10 @@ class Level0DataApi(object):
                 id = fits_id
             ),metadata = get_auth_headers())
 
-            if resp.record is None:
+            if resp.record is None or resp.record.id == 0:
                 return Result.error(message=f"fits_id:{fits_id} not found")  
 
-            return Result.ok_data(data=resp.record)
+            return Result.ok_data(data = Level0Record.from_proto_model(resp.record))
            
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))   
@@ -141,7 +144,7 @@ class Level0DataApi(object):
         try:
             resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data=resp.record)
+                return Result.ok_data(data = Level0Record.from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
     

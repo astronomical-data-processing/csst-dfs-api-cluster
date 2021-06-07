@@ -1,5 +1,7 @@
 import grpc
 from csst_dfs_commons.models import Result
+from csst_dfs_commons.models.common import from_proto_model_list, Gaia3Record
+
 from csst_dfs_proto.common.ephem import ephem_pb2, ephem_pb2_grpc
 from .service import ServiceProxy
 from .constants import *
@@ -34,7 +36,7 @@ class CatalogApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
-                return Result.ok_data(data=resp.records).append("totalCount", resp.totalCount)
+                return Result.ok_data(data=from_proto_model_list(Gaia3Record, resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
