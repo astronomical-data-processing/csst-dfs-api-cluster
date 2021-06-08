@@ -30,7 +30,7 @@ class Level0DataApi(object):
         '''
         try:
             resp, _ =  self.stub.Find.with_call(level0_pb2.FindLevel0DataReq(
-                obs_id = get_parameter(kwargs, "obs_id"),
+                obs_id = get_parameter(kwargs, "obs_id", 0),
                 detector_no = get_parameter(kwargs, "detector_no"),
                 obs_type = get_parameter(kwargs, "obs_type"),
                 exp_time_start = get_parameter(kwargs, "obs_time", [None, None])[0],
@@ -67,7 +67,7 @@ class Level0DataApi(object):
             if resp.record is None or resp.record.id == 0:
                 return Result.error(message=f"fits_id:{fits_id} not found")  
 
-            return Result.ok_data(data = Level0Record.from_proto_model(resp.record))
+            return Result.ok_data(data = Level0Record().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))   
@@ -144,7 +144,7 @@ class Level0DataApi(object):
         try:
             resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data = Level0Record.from_proto_model(resp.record))
+                return Result.ok_data(data = Level0Record().from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
     

@@ -67,7 +67,7 @@ class ObservationApi(object):
             if resp.observation is None or resp.observation.id == 0:
                 return Result.error(message=f"obs_id:{obs_id} not found")  
 
-            return Result.ok_data(data=Observation.from_proto_model(resp.observation))
+            return Result.ok_data(data=Observation().from_proto_model(resp.observation))
            
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))        
@@ -120,6 +120,7 @@ class ObservationApi(object):
         ''' insert a observational record into database
  
         parameter kwargs:
+            obs_id = [int]
             obs_time = [str]
             exp_time = [int]
             module_id = [str]
@@ -130,6 +131,7 @@ class ObservationApi(object):
         '''   
 
         rec = observation_pb2.Observation(
+            id = get_parameter(kwargs, "obs_id", 0),
             obs_time = get_parameter(kwargs, "obs_time"),
             exp_time = get_parameter(kwargs, "exp_time"),
             module_id = get_parameter(kwargs, "module_id"),
@@ -141,7 +143,7 @@ class ObservationApi(object):
         try:
             resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data=Observation.from_proto_model(resp.record))
+                return Result.ok_data(data=Observation().from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
     

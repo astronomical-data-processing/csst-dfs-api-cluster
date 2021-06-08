@@ -69,7 +69,7 @@ class Level1DataApi(object):
             if resp.record is None or resp.record.id == 0:
                 return Result.error(message=f"id:{id} not found")  
 
-            return Result.ok_data(data = Level1Record.from_proto_model(resp.record))
+            return Result.ok_data(data = Level1Record().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))   
@@ -157,7 +157,7 @@ class Level1DataApi(object):
         try:
             resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data=Level1Record.from_proto_model(resp.record))
+                return Result.ok_data(data=Level1Record().from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:

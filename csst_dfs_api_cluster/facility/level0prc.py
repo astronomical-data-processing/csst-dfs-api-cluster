@@ -93,7 +93,7 @@ class Level0PrcApi(object):
         try:
             resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data = Level0PrcRecord.from_proto_model(resp.record))
+                return Result.ok_data(data = Level0PrcRecord().from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
