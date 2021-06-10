@@ -1,4 +1,5 @@
 import grpc
+import datetime
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
@@ -149,8 +150,8 @@ class Level1DataApi(object):
             bias_id = get_parameter(kwargs, "bias_id"),
             filename = get_parameter(kwargs, "filename"),
             file_path = get_parameter(kwargs, "file_path"),
-            prc_status = get_parameter(kwargs, "prc_status"),
-            prc_time = get_parameter(kwargs, "prc_time"),
+            prc_status = get_parameter(kwargs, "prc_status", -1),
+            prc_time = get_parameter(kwargs, "prc_time", format_datetime(datetime.datetime.now())),
             pipeline_id = get_parameter(kwargs, "pipeline_id")
         )
         req = level1_pb2.WriteLevel1Req(record = rec)

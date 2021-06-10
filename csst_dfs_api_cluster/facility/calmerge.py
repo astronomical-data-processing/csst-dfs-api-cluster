@@ -122,7 +122,6 @@ class CalMergeApi(object):
         ''' insert a calibration merge record into database
  
         parameter kwargs:
-            id : [int]
             detector_no : [str]
             ref_type : [str]
             obs_time : [str]
@@ -143,7 +142,7 @@ class CalMergeApi(object):
             exp_time = get_parameter(kwargs, "exp_time"),
             filename = get_parameter(kwargs, "filename"),
             file_path = get_parameter(kwargs, "file_path"),
-            prc_status = get_parameter(kwargs, "prc_status"),
+            prc_status = get_parameter(kwargs, "prc_status",-1),
             prc_time = get_parameter(kwargs, "prc_time"),
             level0_ids = get_parameter(kwargs, "level0_ids", [])
         )
