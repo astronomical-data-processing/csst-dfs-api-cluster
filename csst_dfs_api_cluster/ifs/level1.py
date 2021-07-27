@@ -21,7 +21,7 @@ class Level1DataApi(object):
         ''' retrieve level1 records from database
 
         parameter kwargs:
-            raw_id: [int]
+            level0_id: [str]
             data_type: [str]
             obs_type: [str]
             create_time : (start, end),
@@ -34,7 +34,7 @@ class Level1DataApi(object):
         '''
         try:
             resp, _ =  self.stub.Find.with_call(level1_pb2.FindLevel1Req(
-                raw_id = get_parameter(kwargs, "raw_id"),
+                level0_id = get_parameter(kwargs, "level0_id"),
                 data_type = get_parameter(kwargs, "data_type"),
                 create_time_start = get_parameter(kwargs, "create_time", [None, None])[0],
                 create_time_end = get_parameter(kwargs, "create_time", [None, None])[1],
@@ -123,7 +123,7 @@ class Level1DataApi(object):
         ''' insert a level1 record into database
  
         parameter kwargs:
-            raw_id : [int]
+            level0_id : [str]
             data_type : [str]
             cor_sci_id : [int]
             prc_params : [str]
@@ -142,9 +142,9 @@ class Level1DataApi(object):
         return csst_dfs_common.models.Result
         '''   
 
-        rec = level1_pb2.Detector(
+        rec = level1_pb2.Level1Record(
             id = 0,
-            raw_id = get_parameter(kwargs, "raw_id"),
+            level0_id = get_parameter(kwargs, "level0_id"),
             data_type = get_parameter(kwargs, "data_type"),
             cor_sci_id = get_parameter(kwargs, "cor_sci_id"),
             prc_params = get_parameter(kwargs, "prc_params"),
@@ -157,7 +157,7 @@ class Level1DataApi(object):
             filename = get_parameter(kwargs, "filename"),
             file_path = get_parameter(kwargs, "file_path"),
             prc_status = get_parameter(kwargs, "prc_status", -1),
-            prc_time = get_parameter(kwargs, "prc_time", format_datetime(datetime.datetime.now())),
+            prc_time = get_parameter(kwargs, "prc_time", format_datetime(datetime.now())),
             pipeline_id = get_parameter(kwargs, "pipeline_id")
         )
         req = level1_pb2.WriteLevel1Req(record = rec)

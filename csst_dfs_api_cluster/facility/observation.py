@@ -54,18 +54,21 @@ class ObservationApi(object):
         '''  fetch a record from database
 
         parameter kwargs:
-            obs_id : [int] 
+            id : [int],
+            obs_id = [str]
 
         return csst_dfs_common.models.Result
         '''
         try:
+            id = get_parameter(kwargs, "id")
             obs_id = get_parameter(kwargs, "obs_id")
             resp, _ =  self.stub.Get.with_call(observation_pb2.GetObservationReq(
+                id = id,
                 obs_id = obs_id
             ),metadata = get_auth_headers())
 
             if resp.observation is None or resp.observation.id == 0:
-                return Result.error(message=f"obs_id:{obs_id} not found")  
+                return Result.error(message=f"not found")  
 
             return Result.ok_data(data=Observation().from_proto_model(resp.observation))
            
@@ -76,16 +79,21 @@ class ObservationApi(object):
         ''' update the status of reduction
 
         parameter kwargs:
-            obs_id : [int],
+            id : [int],
+            obs_id = [str],
             status : [int]
 
         return csst_dfs_common.models.Result
         '''
+        id = get_parameter(kwargs, "id")
         obs_id = get_parameter(kwargs, "obs_id")
         status = get_parameter(kwargs, "status")
         try:
             resp,_ = self.stub.UpdateProcStatus.with_call(
-                observation_pb2.UpdateProcStatusReq(obs_id=obs_id, status=status),
+                observation_pb2.UpdateProcStatusReq(
+                    id = id,
+                    obs_id = obs_id,
+                    status = status),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -99,14 +107,19 @@ class ObservationApi(object):
         ''' update the status of QC0
         
         parameter kwargs:
-            obs_id : [int],
+            id : [int],
+            obs_id = [str],
             status : [int]
         '''        
+        id = get_parameter(kwargs, "id")
         obs_id = get_parameter(kwargs, "obs_id")
         status = get_parameter(kwargs, "status")
         try:
             resp,_ = self.stub.UpdateQc0Status.with_call(
-                observation_pb2.UpdateQc0StatusReq(obs_id=obs_id, status=status),
+                observation_pb2.UpdateQc0StatusReq(
+                    id = id,
+                    obs_id = obs_id,
+                    status=status),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -120,7 +133,8 @@ class ObservationApi(object):
         ''' insert a observational record into database
  
         parameter kwargs:
-            obs_id = [int]
+            id = [id]
+            obs_id = [str]
             obs_time = [str]
             exp_time = [int]
             module_id = [str]
@@ -131,7 +145,8 @@ class ObservationApi(object):
         '''   
 
         rec = observation_pb2.Observation(
-            id = get_parameter(kwargs, "obs_id", 0),
+            id = get_parameter(kwargs, "id", 0),
+            obs_id = get_parameter(kwargs, "obs_id", ""),
             obs_time = get_parameter(kwargs, "obs_time"),
             exp_time = get_parameter(kwargs, "exp_time"),
             module_id = get_parameter(kwargs, "module_id"),

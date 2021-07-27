@@ -17,7 +17,7 @@ class Level0DataApi(object):
         ''' retrieve level0 records from database
 
         parameter kwargs:
-            obs_id: [int]
+            obs_id: [str]
             detector_no: [str]
             obs_type: [str]
             obs_time : (start, end),
@@ -30,7 +30,7 @@ class Level0DataApi(object):
         '''
         try:
             resp, _ =  self.stub.Find.with_call(level0_pb2.FindLevel0DataReq(
-                obs_id = get_parameter(kwargs, "obs_id", 0),
+                obs_id = get_parameter(kwargs, "obs_id"),
                 detector_no = get_parameter(kwargs, "detector_no"),
                 obs_type = get_parameter(kwargs, "obs_type"),
                 exp_time_start = get_parameter(kwargs, "obs_time", [None, None])[0],
@@ -54,18 +54,21 @@ class Level0DataApi(object):
         '''  fetch a record from database
 
         parameter kwargs:
-            fits_id : [int] 
+            id : [int],
+            level0_id: [str]
 
         return csst_dfs_common.models.Result
         '''
         try:
-            fits_id = get_parameter(kwargs, "fits_id")
+            id = get_parameter(kwargs, "id")
+            level0_id = get_parameter(kwargs, "level0_id")
             resp, _ =  self.stub.Get.with_call(level0_pb2.GetLevel0DataReq(
-                id = fits_id
+                id = id,
+                level0_id = level0_id
             ),metadata = get_auth_headers())
 
             if resp.record is None or resp.record.id == 0:
-                return Result.error(message=f"fits_id:{fits_id} not found")  
+                return Result.error(message=f"not found")  
 
             return Result.ok_data(data = Level0Record().from_proto_model(resp.record))
            
@@ -76,16 +79,21 @@ class Level0DataApi(object):
         ''' update the status of reduction
 
         parameter kwargs:
-            fits_id : [int],
+            id : [int],
+            level0_id: [str],
             status : [int]
 
         return csst_dfs_common.models.Result
         '''
-        fits_id = get_parameter(kwargs, "fits_id")
+        id = get_parameter(kwargs, "id")
+        level0_id = get_parameter(kwargs, "level0_id")
         status = get_parameter(kwargs, "status")
         try:
             resp,_ = self.stub.UpdateProcStatus.with_call(
-                level0_pb2.UpdateProcStatusReq(id=fits_id, status=status),
+                level0_pb2.UpdateProcStatusReq(
+                    id=id,
+                    level0_id = level0_id,
+                    status=status),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -99,14 +107,19 @@ class Level0DataApi(object):
         ''' update the status of QC0
         
         parameter kwargs:
-            fits_id : [int],
+            id : [int],
+            level0_id: [str],
             status : [int]
         '''        
-        fits_id = get_parameter(kwargs, "fits_id")
+        id = get_parameter(kwargs, "id")
+        level0_id = get_parameter(kwargs, "level0_id")
         status = get_parameter(kwargs, "status")
         try:
             resp,_ = self.stub.UpdateQc0Status.with_call(
-                level0_pb2.UpdateQc0StatusReq(id=fits_id, status=status),
+                level0_pb2.UpdateQc0StatusReq( 
+                    id=id,
+                    level0_id = level0_id,
+                    status=status),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -120,7 +133,7 @@ class Level0DataApi(object):
         ''' insert a level0 data record into database
  
         parameter kwargs:
-            obs_id = [int]
+            obs_id = [str]
             detector_no = [str]
             obs_type = [str]        
             obs_time = [str]

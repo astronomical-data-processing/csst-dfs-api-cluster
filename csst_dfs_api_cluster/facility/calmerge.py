@@ -51,19 +51,21 @@ class CalMergeApi(object):
     def get(self, **kwargs):
         '''  fetch a record from database
 
-        parameter kwargs:
-            id : [int] 
-
-        return csst_dfs_common.models.Result
+        :param kwargs: Parameter dictionary, key items support:
+            id : [int]
+        
+        :returns: csst_dfs_common.models.Result
         '''
         try:
-            id = get_parameter(kwargs, "id")
+            id = get_parameter(kwargs, "id", 0)
+            cal_id = get_parameter(kwargs, "cal_id", "")
             resp, _ =  self.stub.Get.with_call(calmerge_pb2.GetCalMergeReq(
-                id = id
+                id = id,
+                cal_id = cal_id
             ),metadata = get_auth_headers())
 
             if resp.record.id == 0:
-                return Result.error(message=f"id:{id} not found")  
+                return Result.error(message=f"not found")  
 
             return Result.ok_data(data=CalMergeRecord().from_proto_model(resp.record))
            
@@ -75,16 +77,21 @@ class CalMergeApi(object):
 
         parameter kwargs:
             id : [int],
+            cal_id = cal_id,
             status : [int]
 
         return csst_dfs_common.models.Result
         '''
-        id = get_parameter(kwargs, "id")
+        id = get_parameter(kwargs, "id", 0)
+        cal_id = get_parameter(kwargs, "cal_id", "")
         status = get_parameter(kwargs, "status")
 
         try:
             resp,_ = self.stub.UpdateQc1Status.with_call(
-                calmerge_pb2.UpdateQc1StatusReq(id=id, status=status),
+                calmerge_pb2.UpdateQc1StatusReq(
+                    id = id, 
+                    cal_id = cal_id,
+                    status=status),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -99,16 +106,21 @@ class CalMergeApi(object):
 
         parameter kwargs:
             id : [int],
+            cal_id: [str],
             status : [int]
 
         return csst_dfs_common.models.Result
         '''
-        id = get_parameter(kwargs, "id")
+        id = get_parameter(kwargs, "id", 0)
+        cal_id = get_parameter(kwargs, "cal_id", "")
         status = get_parameter(kwargs, "status")
 
         try:
             resp,_ = self.stub.UpdateProcStatus.with_call(
-                calmerge_pb2.UpdateProcStatusReq(id=id, status=status),
+                calmerge_pb2.UpdateProcStatusReq(
+                    id = id,
+                    cal_id = cal_id,
+                    status=status),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -122,6 +134,7 @@ class CalMergeApi(object):
         ''' insert a calibration merge record into database
  
         parameter kwargs:
+            cal_id : [str],
             detector_no : [str]
             ref_type : [str]
             obs_time : [str]
@@ -136,6 +149,7 @@ class CalMergeApi(object):
 
         rec = calmerge_pb2.CalMergeRecord(
             id = 0,
+            cal_id = get_parameter(kwargs, "cal_id"),
             detector_no = get_parameter(kwargs, "detector_no"),
             ref_type = get_parameter(kwargs, "ref_type"),
             obs_time = get_parameter(kwargs, "obs_time"),
