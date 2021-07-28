@@ -13,6 +13,29 @@ class CalMergeApi(object):
     def __init__(self):
         self.stub = calmerge_pb2_grpc.CalMergeSrvStub(ServiceProxy().channel())
 
+    def get_latest_by_l0(self, **kwargs):
+        ''' retrieve calibration merge records from database by level0 data
+
+        parameter kwargs:
+            level0_id: [str]
+            ref_type: [str]
+
+        return: csst_dfs_common.models.Result
+        '''
+        try:
+            resp, _ =  self.stub.GetLatestByL0.with_call(calmerge_pb2.GetLatestByL0Req(
+                level0_id = get_parameter(kwargs, "level0_id"),
+                ref_type = get_parameter(kwargs, "ref_type")),
+            metadata = get_auth_headers())
+
+            if resp.record.id == 0:
+                return Result.error(message=f"not found")  
+
+            return Result.ok_data(data=CalMergeRecord().from_proto_model(resp.record))
+
+        except grpc.RpcError as e:
+            return Result.error(message="%s:%s" % (e.code().value, e.details))
+
     def find(self, **kwargs):
         ''' retrieve calibration merge records from database
 
