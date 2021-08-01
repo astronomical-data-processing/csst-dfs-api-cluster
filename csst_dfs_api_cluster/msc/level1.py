@@ -149,8 +149,8 @@ class Level1DataApi(object):
             flat_id = get_parameter(kwargs, "flat_id"),
             dark_id = get_parameter(kwargs, "dark_id"),
             bias_id = get_parameter(kwargs, "bias_id"),
-            filename = get_parameter(kwargs, "filename"),
-            file_path = get_parameter(kwargs, "file_path"),
+            filename = get_parameter(kwargs, "filename", ""),
+            file_path = get_parameter(kwargs, "file_path", ""),
             prc_status = get_parameter(kwargs, "prc_status", -1),
             prc_time = get_parameter(kwargs, "prc_time", format_datetime(datetime.now())),
             pipeline_id = get_parameter(kwargs, "pipeline_id")
@@ -163,8 +163,13 @@ class Level1DataApi(object):
                         break
                     yield level1_pb2.WriteLevel1Req(record = rec, data = data)
         try:
+            if not rec.file_path:
+                return Result.error(message="file_path is blank")
             if not os.path.exists(rec.file_path):
                 return Result.error(message="the file [%s] not existed" % (rec.file_path, ))
+            if not rec.filename:
+                rec.filename = os.path.basename(rec.file_path)
+
             resp,_ = self.stub.Write.with_call(stream(rec),metadata = get_auth_headers())
             if resp.success:
                 return Result.ok_data(data=Level1Record().from_proto_model(resp.record))
