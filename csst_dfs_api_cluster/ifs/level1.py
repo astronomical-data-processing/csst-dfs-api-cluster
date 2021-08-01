@@ -170,8 +170,12 @@ class Level1DataApi(object):
                     yield level1_pb2.WriteLevel1Req(record = rec, data = data)
 
         try:
+            if not rec.file_path:
+                return Result.error(message="file_path is blank")
             if not os.path.exists(rec.file_path):
                 return Result.error(message="the file [%s] not existed" % (rec.file_path, ))
+            if not rec.filename:
+                rec.filename = os.path.basename(rec.file_path)
 
             resp,_ = self.stub.Write.with_call(stream(rec),metadata = get_auth_headers())
             if resp.success:
