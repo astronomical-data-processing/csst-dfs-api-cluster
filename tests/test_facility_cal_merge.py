@@ -16,7 +16,7 @@ class CalMergeApiTestCase(unittest.TestCase):
         print('find:', recs)
 
     def test_get_latest_by_l0(self):
-        rec = self.api.get_latest_by_l0(level0_id='000001102', ref_type = "bias")
+        rec = self.api.get_latest_by_l0(level0_id='00000002401', ref_type = "bias")
         print('get_latest_by_l0:', rec)
         
     def test_get(self):
@@ -33,8 +33,8 @@ class CalMergeApiTestCase(unittest.TestCase):
 
     def test_write(self):
         rec = self.api.write(
-            cal_id = "10000X01",
-            detector_no='01', 
+            cal_id = "10000X03",
+            detector_no='03', 
             ref_type = "bias",
             obs_time = "2021-06-04 11:12:13",
             exp_time = 150,

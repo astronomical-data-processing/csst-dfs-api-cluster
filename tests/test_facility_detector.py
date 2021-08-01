@@ -12,26 +12,26 @@ class DetectorApiTestCase(unittest.TestCase):
         print('find:', recs)
 
     def test_get(self):
-        rec = self.api.get(no = 'CCD01')
+        rec = self.api.get(no = '02')
         print('get:', rec)
 
     def test_write(self):
-        rec = self.api.write(no = 'CCD02', 
-                detector_name = 'CCD02', 
+        rec = self.api.write(no = '05', 
+                detector_name = 'CCD05', 
                 module_id = 'MSC', 
-                filter_id='f2')
+                filter_id='f5')
         print('write:', rec)
 
     def test_update(self):
-        rec = self.api.update(no = 'CCD01', filter_id = 'f1')
+        rec = self.api.update(no = '01', filter_id = 'f1')
         print('update:', rec)
 
     def test_delete(self):
-        rec = self.api.delete(no = 'CCD01')
+        rec = self.api.delete(no = '01')
         print('delete:', rec)
 
     def test_find_status(self):
-        recs = self.api.find_status(detector_no = 'CCD01', 
+        recs = self.api.find_status(detector_no = '01', 
             status_occur_time = ('2021-06-02','2021-06-08'), 
             limit = 0)
         print('find status:', recs)
@@ -41,5 +41,5 @@ class DetectorApiTestCase(unittest.TestCase):
         print('get status:', rec)
 
     def test_write_status(self):
-        rec = self.api.write_status(detector_no = 'CCD01', status = '{........}',status_time='2021-06-05 12:12:13')
+        rec = self.api.write_status(detector_no = '01', status = '{........}',status_time='2021-06-05 12:12:13')
         print('write status:', rec)

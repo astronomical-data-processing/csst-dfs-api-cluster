@@ -38,7 +38,7 @@ class MSCLevel1DataTestCase(unittest.TestCase):
             bias_id = 3,
             prc_status = 3,
             prc_time = '2021-06-04 11:12:13',
-            filename = "dddasd",
-            file_path = "/opt/dddasd.fits",
+            filename = "MSC_MS_210525121500_100000001_09_raw",
+            file_path = "/opt/temp/csst/MSC_MS_210525121500_100000001_09_raw.fits",
             pipeline_id = "P1")
         print('write:', rec)

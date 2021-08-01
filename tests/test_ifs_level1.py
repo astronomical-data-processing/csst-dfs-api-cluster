@@ -41,7 +41,7 @@ class IFSLevel1DataTestCase(unittest.TestCase):
             sky_id = 6,            
             prc_status = 3,
             prc_time = '2021-06-05 11:12:13',
-            filename = "dddasd",
-            file_path = "/opt/dddasd.fits",
+            filename = "MSC_MS_210525121500_100000001_09_IFS",
+            file_path = "/opt/temp/csst/MSC_MS_210525121500_100000001_09_raw.fits",
             pipeline_id = "P2")
         print('write:', rec)

@@ -1,10 +1,11 @@
+import os
 import grpc
 import datetime
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
 from csst_dfs_commons.models.msc import Level1Record
-
+from csst_dfs_commons.models.constants import UPLOAD_CHUNK_SIZE
 from csst_dfs_proto.msc.level1 import level1_pb2, level1_pb2_grpc
 
 from ..common.service import ServiceProxy
@@ -154,9 +155,17 @@ class Level1DataApi(object):
             prc_time = get_parameter(kwargs, "prc_time", format_datetime(datetime.now())),
             pipeline_id = get_parameter(kwargs, "pipeline_id")
         )
-        req = level1_pb2.WriteLevel1Req(record = rec)
+        def stream(rec):
+            with open(rec.file_path, 'rb') as f:
+                while True:
+                    data = f.read(UPLOAD_CHUNK_SIZE)
+                    if not data:
+                        break
+                    yield level1_pb2.WriteLevel1Req(record = rec, data = data)
         try:
-            resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
+            if not os.path.exists(rec.file_path):
+                return Result.error(message="the file [%s] not existed" % (rec.file_path, ))
+            resp,_ = self.stub.Write.with_call(stream(rec),metadata = get_auth_headers())
             if resp.success:
                 return Result.ok_data(data=Level1Record().from_proto_model(resp.record))
             else:
