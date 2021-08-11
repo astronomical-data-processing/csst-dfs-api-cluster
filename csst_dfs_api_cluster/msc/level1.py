@@ -159,7 +159,6 @@ class Level1DataApi(object):
             with open(rec.file_path, 'rb') as f:
                 while True:
                     data = f.read(UPLOAD_CHUNK_SIZE)
-                    print("read data len: %d" %(len(data),))
                     if not data:
                         break
                     yield level1_pb2.WriteLevel1Req(record = rec, data = data)
