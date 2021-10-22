@@ -39,3 +39,4 @@ test_reports.xml
 **/.eggs
 
 **/_version.py
+.hypothesis
