@@ -4,9 +4,9 @@ import datetime
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
-from csst_dfs_commons.models.msc import Level1Record
+from csst_dfs_commons.models.sls import Level1Record
 from csst_dfs_commons.models.constants import UPLOAD_CHUNK_SIZE
-from csst_dfs_proto.msc.level1 import level1_pb2, level1_pb2_grpc
+from csst_dfs_proto.sls.level1 import level1_pb2, level1_pb2_grpc
 
 from ..common.service import ServiceProxy
 from ..common.utils import *
@@ -125,7 +125,6 @@ class Level1DataApi(object):
         parameter kwargs:
             level0_id : [str]
             data_type : [str]
-            cor_sci_id : [int]
             prc_params : [str]
             filename : [str]
             file_path : [str]            
@@ -141,7 +140,6 @@ class Level1DataApi(object):
             id = 0,
             level0_id = get_parameter(kwargs, "level0_id"),
             data_type = get_parameter(kwargs, "data_type"),
-            cor_sci_id = get_parameter(kwargs, "cor_sci_id"),
             prc_params = get_parameter(kwargs, "prc_params"),
             filename = get_parameter(kwargs, "filename", ""),
             file_path = get_parameter(kwargs, "file_path", ""),

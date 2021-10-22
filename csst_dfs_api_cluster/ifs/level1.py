@@ -24,7 +24,6 @@ class Level1DataApi(object):
         parameter kwargs:
             level0_id: [str]
             data_type: [str]
-            obs_type: [str]
             create_time : (start, end),
             qc1_status : [int],
             prc_status : [int],
@@ -69,7 +68,7 @@ class Level1DataApi(object):
             ),metadata = get_auth_headers())
 
             if resp.record is None or resp.record.id == 0:
-                return Result.error(message=f"id:{id} not found")  
+                return Result.error(message=f"id:{fits_id} not found")  
 
             return Result.ok_data(data=Level1Record().from_proto_model(resp.record))
            
@@ -128,17 +127,12 @@ class Level1DataApi(object):
             data_type : [str]
             cor_sci_id : [int]
             prc_params : [str]
-            flat_id : [int]
-            dark_id : [int]
-            bias_id : [int]
-            lamp_id : [int]
-            arc_id : [int]
-            sky_id : [int]            
             filename : [str]
             file_path : [str]            
             prc_status : [int]
             prc_time : [str]
             pipeline_id : [str]
+            refs: [dict]
 
         return csst_dfs_common.models.Result
         '''   
@@ -149,17 +143,12 @@ class Level1DataApi(object):
             data_type = get_parameter(kwargs, "data_type"),
             cor_sci_id = get_parameter(kwargs, "cor_sci_id"),
             prc_params = get_parameter(kwargs, "prc_params"),
-            flat_id = get_parameter(kwargs, "flat_id"),
-            dark_id = get_parameter(kwargs, "dark_id"),
-            bias_id = get_parameter(kwargs, "bias_id"),
-            lamp_id = get_parameter(kwargs, "lamp_id"),
-            arc_id = get_parameter(kwargs, "arc_id"),
-            sky_id = get_parameter(kwargs, "sky_id"),
             filename = get_parameter(kwargs, "filename"),
             file_path = get_parameter(kwargs, "file_path"),
             prc_status = get_parameter(kwargs, "prc_status", -1),
             prc_time = get_parameter(kwargs, "prc_time", format_datetime(datetime.now())),
-            pipeline_id = get_parameter(kwargs, "pipeline_id")
+            pipeline_id = get_parameter(kwargs, "pipeline_id"),
+            refs = get_parameter(kwargs, "refs", {})
         )
         def stream(rec):
             with open(rec.file_path, 'rb') as f:
