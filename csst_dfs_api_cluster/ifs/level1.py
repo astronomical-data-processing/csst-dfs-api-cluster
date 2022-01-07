@@ -62,13 +62,14 @@ class Level1DataApi(object):
         return csst_dfs_common.models.Result
         '''
         try:
-            fits_id = get_parameter(kwargs, "id")
             resp, _ =  self.stub.Get.with_call(level1_pb2.GetLevel1Req(
-                id = fits_id
+                id = get_parameter(kwargs, "id"),
+                level0_id = get_parameter(kwargs, "level0_id"),
+                data_type = get_parameter(kwargs, "data_type") 
             ),metadata = get_auth_headers())
 
             if resp.record is None or resp.record.id == 0:
-                return Result.error(message=f"id:{fits_id} not found")  
+                return Result.error(message=f"data not found")  
 
             return Result.ok_data(data=Level1Record().from_proto_model(resp.record))
            
