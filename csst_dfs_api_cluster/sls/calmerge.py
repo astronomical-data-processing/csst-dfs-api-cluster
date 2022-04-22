@@ -2,9 +2,9 @@ import grpc
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
-from csst_dfs_commons.models.facility import CalMergeRecord
+from csst_dfs_commons.models.sls import CalMergeRecord
 
-from csst_dfs_proto.facility.calmerge import calmerge_pb2, calmerge_pb2_grpc
+from csst_dfs_proto.sls.calmerge import calmerge_pb2, calmerge_pb2_grpc
 
 from ..common.service import ServiceProxy
 from ..common.utils import *
