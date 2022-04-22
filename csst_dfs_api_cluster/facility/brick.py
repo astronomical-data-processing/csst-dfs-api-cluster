@@ -2,7 +2,7 @@ import grpc
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
-from csst_dfs_commons.models.facility import Brick, FindObsStatus, BrickLevel1
+from csst_dfs_commons.models.facility import Brick, BrickObsStatus, BrickLevel1
 
 from csst_dfs_proto.facility.brick import brick_pb2, brick_pb2_grpc
 
@@ -53,7 +53,7 @@ class BrickApi(object):
                 id = brick_id
             ),metadata = get_auth_headers())
 
-            if resp.brick is None or resp.brick.id == -1:
+            if resp.record is None or (resp.record.id == 0 and resp.record.ra == 0.0 and resp.record.dec == 0.0):
                 return Result.error(message=f"{brick_id} not found")  
 
             return Result.ok_data(data=Brick().from_proto_model(resp.record))
@@ -71,8 +71,8 @@ class BrickApi(object):
         
         :returns: csst_dfs_common.models.Result
         '''  
-        rec = brick_pb2.Brick(
-            id = get_parameter(kwargs, "id", 0),
+        rec = brick_pb2.BrickRecord(
+            id = get_parameter(kwargs, "id", -1),
             ra = get_parameter(kwargs, "ra", 0.0),
             dec = get_parameter(kwargs, "dec", 0.0),
             boundingbox = get_parameter(kwargs, "boundingbox", "")
@@ -93,18 +93,20 @@ class BrickApi(object):
 
         :param kwargs:
             brick_id = [int],
-            band = [string]
+            band = [string],
+            limit = [int]
 
         :returns: csst_dfs_common.models.Result
         '''
         try:
             resp, _ =  self.stub.FindObsStatus.with_call(brick_pb2.FindObsStatusReq(
                 brick_id = get_parameter(kwargs, "brick_id", -1),
-                band = get_parameter(kwargs, "band", "")
+                band = get_parameter(kwargs, "band", ""),
+                limit = get_parameter(kwargs, "limit", 0)
             ),metadata = get_auth_headers())
 
             if resp.success:
-                return Result.ok_data(data = from_proto_model_list(FindObsStatus, resp.records)).append("totalCount", resp.totalCount)
+                return Result.ok_data(data = from_proto_model_list(BrickObsStatus, resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
@@ -117,7 +119,8 @@ class BrickApi(object):
         :param kwargs: Parameter dictionary, support:
             brick_id = [int]\n
             level1_id = [int]\n
-            module = [str]
+            module = [str],
+            limit = [int]
 
         :returns: csst_dfs_common.models.Result
         '''
@@ -125,7 +128,8 @@ class BrickApi(object):
             resp, _ =  self.stub.FindLevel1.with_call(brick_pb2.FindLevel1Req(
                 brick_id = get_parameter(kwargs, "brick_id", -1),
                 level1_id = get_parameter(kwargs, "level1_id", 0),
-                module = get_parameter(kwargs, "limit", "")
+                module = get_parameter(kwargs, "limit", ""),
+                limit = get_parameter(kwargs, "limit", 0)
             ),metadata = get_auth_headers())
 
             if resp.success:

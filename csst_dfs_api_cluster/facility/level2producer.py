@@ -101,9 +101,8 @@ class Level2ProducerApi(object):
         :returns: csst_dfs_common.models.Result
         '''
         try:
-
             resp, _ =  self.stub.FindNexts.with_call(level2producer_pb2.FindNextsReq(
-                id = get_parameter(kwargs, "id")
+                id = get_parameter(kwargs, "id", 0)
             ),metadata = get_auth_headers())
 
             if resp.success:
@@ -150,15 +149,16 @@ class Level2ProducerApi(object):
         :returns: csst_dfs_common.models.Result            
         '''   
         try:
-            resp,_ = self.stub.Update.with_call(
-                level2producer_pb2.UpdateReq(
+            rec = level2producer_pb2.Level2ProducerRecord(
                     id = get_parameter(kwargs, "id", 0),
                     name = get_parameter(kwargs, "name", ""),
                     gitlink = get_parameter(kwargs, "gitlink", ""),
                     paramfiles = get_parameter(kwargs, "paramfiles", ""),
                     priority = get_parameter(kwargs, "priority", 0),
                     pre_producers = get_parameter(kwargs, "pre_producers",[])
-                ),
+            )            
+            resp,_ = self.stub.Update.with_call(
+                level2producer_pb2.UpdateReq(record = rec),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -244,6 +244,7 @@ class Level2ProducerApi(object):
         
         :returns: csst_dfs_common.models.Result
         '''    
+
         rec = level2producer_pb2.Level2JobRecord(
             id = get_parameter(kwargs, "id", 0), 
             dag = get_parameter(kwargs, "dag", ""),
@@ -316,7 +317,7 @@ class Level2ProducerApi(object):
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details))  
 
-    def udpate_running(self, **kwargs):
+    def update_running(self, **kwargs):
         ''' udpate a Level2ProducerRuningRecord data
  
         :param kwargs: Parameter dictionary, key items support:
@@ -353,18 +354,18 @@ class Level2ProducerApi(object):
             return Result.error(message="%s:%s" % (e.code().value, e.details))
 
     def find_running(self, **kwargs):
-        ''' udpate a Level2ProducerRuningRecord data
+        ''' find Level2ProducerRuningRecord data
  
         :param kwargs: Parameter dictionary, key items support:
             job_id = [int]\n
             producer_id = [int]\n
             brick_id = [int]\n
-            create_time = (start, end),\n
             prc_status = [int]\n
-            prc_result = [str]
+            create_time : (start, end)\n
+            limit = [int]
         
         :returns: csst_dfs_common.models.Result
-        ''' 
+        '''  
         req = level2producer_pb2.FindRunningReq(
             job_id = get_parameter(kwargs, "job_id", 0),
             producer_id = get_parameter(kwargs, "producer_id", 0),
