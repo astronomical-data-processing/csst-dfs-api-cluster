@@ -84,7 +84,7 @@ class Level2DataApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
-                return Result.ok_data(data=from_proto_model_list(MSCLevel2CatalogRecord, resp.records)).append("totalCount", resp.totalCount)
+                return Result.ok_data(data=from_proto_model_list(Level2CatalogRecord, resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 

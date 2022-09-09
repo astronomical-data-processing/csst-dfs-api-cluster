@@ -199,6 +199,7 @@ class Level2ProducerApi(object):
         '''  
         rec = level2producer_pb2.Level2JobRecord(
             id = 0,
+            name = get_parameter(kwargs, "name", ""),
             dag = get_parameter(kwargs, "dag", "")
         )
         req = level2producer_pb2.NewJobReq(record = rec)
@@ -244,9 +245,9 @@ class Level2ProducerApi(object):
         
         :returns: csst_dfs_common.models.Result
         '''    
-
         rec = level2producer_pb2.Level2JobRecord(
             id = get_parameter(kwargs, "id", 0), 
+            name = get_parameter(kwargs, "name", ""),
             dag = get_parameter(kwargs, "dag", ""),
             status = get_parameter(kwargs, "status", -1)
         )
