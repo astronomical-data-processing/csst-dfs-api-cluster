@@ -41,5 +41,5 @@ class CatalogApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 

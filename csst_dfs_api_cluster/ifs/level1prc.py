@@ -39,7 +39,7 @@ class Level1PrcApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def update_proc_status(self, **kwargs):
         ''' update the status of reduction
@@ -63,7 +63,7 @@ class Level1PrcApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def write(self, **kwargs):
         ''' insert a level1 procedure record into database
@@ -97,7 +97,7 @@ class Level1PrcApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
    
 

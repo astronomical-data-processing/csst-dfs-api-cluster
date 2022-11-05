@@ -34,7 +34,7 @@ class DetectorApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def get(self, **kwargs):
         '''  fetch a record from database
@@ -56,7 +56,7 @@ class DetectorApi(object):
             return Result.ok_data(data=Detector().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))   
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))   
 
     def update(self, **kwargs):
         ''' update a detector by no
@@ -90,7 +90,7 @@ class DetectorApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def delete(self, **kwargs):
         ''' delete a detector by no
@@ -112,7 +112,7 @@ class DetectorApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def write(self, **kwargs):
         ''' insert a detector record into database
@@ -139,7 +139,7 @@ class DetectorApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def find_status(self, **kwargs):
         ''' retrieve a detector status's from database
@@ -165,7 +165,7 @@ class DetectorApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def get_status(self, **kwargs):
         '''  fetch a record from database
@@ -187,7 +187,7 @@ class DetectorApi(object):
             return Result.ok_data(data=DetectorStatus().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))   
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))   
     
     def write_status(self, **kwargs):
         ''' insert a detector status into database
@@ -213,4 +213,4 @@ class DetectorApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))            
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))            

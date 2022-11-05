@@ -34,7 +34,7 @@ class CalMergeApi(object):
             return Result.ok_data(data=CalMergeRecord().from_proto_model(resp.record))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def find(self, **kwargs):
         ''' retrieve calibration merge records from database
@@ -69,7 +69,7 @@ class CalMergeApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def get(self, **kwargs):
         '''  fetch a record from database
@@ -93,7 +93,7 @@ class CalMergeApi(object):
             return Result.ok_data(data=CalMergeRecord().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))   
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))   
 
     def update_qc1_status(self, **kwargs):
         ''' update the status of reduction
@@ -122,7 +122,7 @@ class CalMergeApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def update_proc_status(self, **kwargs):
         ''' update the status of reduction
@@ -151,7 +151,7 @@ class CalMergeApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def write(self, **kwargs):
         ''' insert a calibration merge record into database
@@ -191,5 +191,5 @@ class CalMergeApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 

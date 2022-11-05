@@ -48,7 +48,7 @@ class Level0DataApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def get(self, **kwargs):
         '''  fetch a record from database
@@ -73,7 +73,7 @@ class Level0DataApi(object):
             return Result.ok_data(data = Level0Record().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))   
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))   
 
     def update_proc_status(self, **kwargs):
         ''' update the status of reduction
@@ -101,7 +101,7 @@ class Level0DataApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def update_qc0_status(self, **kwargs):
         ''' update the status of QC0
@@ -127,7 +127,7 @@ class Level0DataApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def write(self, **kwargs):
         ''' insert a level0 data record into database
@@ -162,6 +162,6 @@ class Level0DataApi(object):
                 return Result.error(message = str(resp.error.detail))
     
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
 

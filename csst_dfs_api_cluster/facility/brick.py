@@ -37,7 +37,7 @@ class BrickApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def get(self, **kwargs):
         '''  fetch a record from database
@@ -59,7 +59,7 @@ class BrickApi(object):
             return Result.ok_data(data=Brick().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))        
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))        
 
     def write(self, **kwargs):
         ''' insert a brickal record into database
@@ -86,7 +86,7 @@ class BrickApi(object):
                 return Result.error(message = str(resp.error.detail))
     
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def find_obs_status(self, **kwargs):
         ''' find observation status of bricks
@@ -111,7 +111,7 @@ class BrickApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def find_level1_data(self, **kwargs):
         ''' find level1 data
@@ -138,4 +138,4 @@ class BrickApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))

@@ -51,7 +51,7 @@ class Level2DataApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def catalog_query(self, **kwargs):
         ''' retrieve level2catalog records from database
@@ -89,7 +89,7 @@ class Level2DataApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def get(self, **kwargs):
         '''  fetch a record from database
@@ -110,7 +110,7 @@ class Level2DataApi(object):
             return Result.ok_data(data = Level2Record().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))   
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))   
 
     def update_proc_status(self, **kwargs):
         ''' update the status of reduction
@@ -133,7 +133,7 @@ class Level2DataApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def update_qc2_status(self, **kwargs):
         ''' update the status of QC0
@@ -154,7 +154,7 @@ class Level2DataApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def write(self, **kwargs):
         ''' insert a level2 record into database
@@ -177,7 +177,8 @@ class Level2DataApi(object):
             filename = get_parameter(kwargs, "filename", ""),
             file_path = get_parameter(kwargs, "file_path", ""),
             prc_status = get_parameter(kwargs, "prc_status", -1),
-            prc_time = get_parameter(kwargs, "prc_time", format_datetime(datetime.now()))
+            prc_time = get_parameter(kwargs, "prc_time", format_datetime(datetime.now())),
+            pipeline_id = get_parameter(kwargs, "pipeline_id", "")
         )
         def stream(rec):
             with open(rec.file_path, 'rb') as f:
@@ -200,4 +201,4 @@ class Level2DataApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))

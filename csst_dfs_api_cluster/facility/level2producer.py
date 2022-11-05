@@ -46,7 +46,7 @@ class Level2ProducerApi(object):
                 return Result.error(message = str(resp.error.detail))
     
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def find(self, **kwargs):
         ''' retrieve Level2Producer records from database
@@ -68,7 +68,7 @@ class Level2ProducerApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def get(self, **kwargs):
         '''  fetch a record from database
@@ -90,7 +90,7 @@ class Level2ProducerApi(object):
             return Result.ok_data(data=Level2Producer().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))        
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))        
 
     def find_nexts(self, **kwargs):
         ''' retrieve Level2Producer records from database
@@ -111,7 +111,7 @@ class Level2ProducerApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def find_start(self, **kwargs):
         ''' retrieve Level2Producer records from database
@@ -133,7 +133,7 @@ class Level2ProducerApi(object):
                 return Result.error(message = str(resp.error.detail))
 
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))            
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))            
 
     def update(self, **kwargs):
         ''' update a Level2Producer
@@ -166,7 +166,7 @@ class Level2ProducerApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def delete(self, **kwargs):
         ''' delete a Level2Producer data
@@ -187,7 +187,7 @@ class Level2ProducerApi(object):
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def new_job(self, **kwargs):
         ''' new a Level2Producer Job
@@ -211,7 +211,7 @@ class Level2ProducerApi(object):
                 return Result.error(message = str(resp.error.detail))
     
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def get_job(self, **kwargs):
         '''  fetch a record from database
@@ -233,7 +233,7 @@ class Level2ProducerApi(object):
             return Result.ok_data(data=Level2Job().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))  
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))  
 
     def update_job(self, **kwargs):
         ''' update a Level2Producer Job
@@ -260,7 +260,7 @@ class Level2ProducerApi(object):
                 return Result.error(message = str(resp.error.detail))
     
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))   
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))   
 
     def new_running(self, **kwargs):
         ''' insert a Level2ProducerRuningRecord data
@@ -294,7 +294,7 @@ class Level2ProducerApi(object):
                 return Result.error(message = str(resp.error.detail))
     
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def get_running(self, **kwargs):
         '''  fetch a record from database
@@ -316,7 +316,7 @@ class Level2ProducerApi(object):
             return Result.ok_data(data=Level2ProducerRuning().from_proto_model(resp.record))
            
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))  
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))  
 
     def update_running(self, **kwargs):
         ''' udpate a Level2ProducerRuningRecord data
@@ -352,7 +352,7 @@ class Level2ProducerApi(object):
                 return Result.error(message = str(resp.error.detail))
     
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def find_running(self, **kwargs):
         ''' find Level2ProducerRuningRecord data
@@ -384,4 +384,4 @@ class Level2ProducerApi(object):
                 return Result.error(message = str(resp.error.detail))
     
         except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details))            
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))            
