@@ -39,11 +39,11 @@ class CatalogApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
-                t_start = time.time()
+                # t_start = time.time()
                 data = from_proto_model_list(Gaia3Record, resp.records)
-                t_end = time.time()
-                log.info("object deserialization used: %.6f's" %(t_end - t_start,))  
-                return Result.ok_data(data=from_proto_model_list(Gaia3Record, resp.records)).append("totalCount", resp.totalCount)
+                # t_end = time.time()
+                # log.info("object deserialization used: %.6f's" %(t_end - t_start,))  
+                return Result.ok_data(data = data).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
