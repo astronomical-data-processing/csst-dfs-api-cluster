@@ -1,4 +1,6 @@
 import grpc
+import time
+import logging
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list, Gaia3Record
 
@@ -7,6 +9,7 @@ from .service import ServiceProxy
 from .constants import *
 from .utils import get_auth_headers
 
+log = logging.getLogger('csst')
 class CatalogApi(object):
     def __init__(self):
         self.stub = ephem_pb2_grpc.EphemSearchSrvStub(ServiceProxy().channel())
@@ -36,6 +39,10 @@ class CatalogApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
+                t_start = time.time()
+                data = from_proto_model_list(Gaia3Record, resp.records)
+                t_end = time.time()
+                log.info("object deserialization used: %.6f's" %(t_end - t_start,))  
                 return Result.ok_data(data=from_proto_model_list(Gaia3Record, resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
