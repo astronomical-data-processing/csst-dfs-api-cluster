@@ -23,6 +23,7 @@ class Level2DataApi(object):
 
         parameter kwargs:
             level0_id: [str]
+            level1_id: [int]
             data_type: [str]
             create_time : (start, end),
             qc2_status : [int],
@@ -34,6 +35,7 @@ class Level2DataApi(object):
         '''
         try:
             resp, _ =  self.stub.Find.with_call(level2_pb2.FindLevel2Req(
+                level0_id = get_parameter(kwargs, "level0_id"),
                 level1_id = get_parameter(kwargs, "level1_id"),
                 data_type = get_parameter(kwargs, "data_type"),
                 create_time_start = get_parameter(kwargs, "create_time", [None, None])[0],
