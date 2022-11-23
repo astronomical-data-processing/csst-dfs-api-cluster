@@ -64,8 +64,6 @@ class Level2DataApi(object):
             ra:  [float] in deg
             dec: [float] in deg
             radius:  [float] in deg   
-            min_mag: [float]
-            max_mag: [float]
             obs_time: (start, end),
             limit: limits returns the number of records,default 0:no-limit
 
@@ -87,6 +85,42 @@ class Level2DataApi(object):
 
             if resp.success:
                 return Result.ok_data(data=from_proto_model_list(Level2CatalogRecord, resp.records)).append("totalCount", resp.totalCount)
+            else:
+                return Result.error(message = str(resp.error.detail))
+
+        except grpc.RpcError as e:
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
+
+    def catalog_query_file(self, **kwargs):
+        ''' retrieve level2catalog records from database
+
+        parameter kwargs:
+            obs_id: [str]
+            detector_no: [str]
+            ra:  [float] in deg
+            dec: [float] in deg
+            radius:  [float] in deg   
+            obs_time: (start, end),
+            limit: limits returns the number of records,default 0:no-limit
+
+        return: csst_dfs_common.models.Result
+        '''
+        try:
+            resp, _ =  self.stub.FindCatalogFile.with_call(level2_pb2.FindLevel2CatalogReq(
+                obs_id = get_parameter(kwargs, "obs_id"),
+                detector_no = get_parameter(kwargs, "detector_no"),
+                obs_time_start = get_parameter(kwargs, "obs_time", [None, None])[0],
+                obs_time_end = get_parameter(kwargs, "obs_time", [None, None])[1],
+                ra = get_parameter(kwargs, "ra"),
+                dec = get_parameter(kwargs, "dec"),
+                radius = get_parameter(kwargs, "radius"),
+                minMag = get_parameter(kwargs, "min_mag"),
+                maxMag = get_parameter(kwargs, "max_mag"),
+                limit = get_parameter(kwargs, "limit", 0)
+            ),metadata = get_auth_headers())
+
+            if resp.success:
+                return Result.ok_data(data=from_proto_model_list(Level2Record, resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
