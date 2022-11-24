@@ -28,25 +28,22 @@ class CatalogApi(object):
         ''' 
         try:
             t_start = time.time()
-            resp, _ = self.stub.Gaia3Search(ephem_pb2.EphemSearchRequest(
-                    ra = ra,
-                    dec = dec,
-                    radius = radius,
-                    minMag = min_mag,
-                    maxMag = max_mag,
-                    obstime = obstime,
-                    limit = limit
-                ),
-                wait_for_ready = True,
-                metadata = get_auth_headers()
-            )
+            resp, _ = self.stub.Gaia3Search.with_call(ephem_pb2.EphemSearchRequest(
+                ra = ra,
+                dec = dec,
+                radius = radius,
+                minMag = min_mag,
+                maxMag = max_mag,
+                obstime = obstime,
+                limit = limit
+            ),metadata = get_auth_headers())
             t_end = time.time()
             log.info("gaia3_query used: %.6f's" %(t_end - t_start,)) 
             if resp.success:
                 t_start = time.time()
                 data = from_proto_model_list(Gaia3Record, resp.records)
                 t_end = time.time()
-                log.info("object deserialization used: %.6f's" %(t_end - t_start,))  
+                # log.info("object deserialization used: %.6f's" %(t_end - t_start,))  
                 return Result.ok_data(data = data).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
