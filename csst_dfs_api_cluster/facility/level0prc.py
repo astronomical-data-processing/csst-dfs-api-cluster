@@ -2,9 +2,9 @@ import grpc
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
-from csst_dfs_commons.models.sls import Level0PrcRecord
+from csst_dfs_commons.models.facility import Level0PrcRecord
 
-from csst_dfs_proto.sls.level0prc import level0prc_pb2, level0prc_pb2_grpc
+from csst_dfs_proto.facility.level0prc import level0prc_pb2, level0prc_pb2_grpc
 
 from ..common.service import ServiceProxy
 from ..common.utils import *

@@ -8,7 +8,8 @@ class ServiceProxy:
     def channel(self):
         options = (('grpc.max_send_message_length', 1000 * 1024 * 1024),
                     ('grpc.max_receive_message_length', 1000 * 1024 * 1024))     
-        channel = grpc.insecure_channel(self.gateway, options = options, compression = grpc.Compression.Gzip)
+        # channel = grpc.insecure_channel(self.gateway, options = options, compression = grpc.Compression.Gzip)
+        channel = grpc.insecure_channel(self.gateway, options = options)
         try:
             grpc.channel_ready_future(channel).result(timeout=10)
         except grpc.FutureTimeoutError:

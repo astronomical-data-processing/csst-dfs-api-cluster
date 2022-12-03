@@ -2,9 +2,9 @@ import grpc
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
-from csst_dfs_commons.models.sls import Level0Record
+from csst_dfs_commons.models.facility import Level0Record
 
-from csst_dfs_proto.sls.level0 import level0_pb2, level0_pb2_grpc
+from csst_dfs_proto.facility.level0 import level0_pb2, level0_pb2_grpc
 
 from ..common.service import ServiceProxy
 from ..common.utils import *
@@ -38,6 +38,11 @@ class Level0DataApi(object):
                 qc0_status = get_parameter(kwargs, "qc0_status"),
                 prc_status = get_parameter(kwargs, "prc_status"),
                 file_name = get_parameter(kwargs, "file_name"),
+                ra_obj  = get_parameter(kwargs, "ra_obj", None),
+                dec_obj = get_parameter(kwargs, "dec_obj", None),
+                radius = get_parameter(kwargs, "radius", 0),
+                object_name = get_parameter(kwargs, "object_name", None),
+                version = get_parameter(kwargs, "version", None),
                 limit = get_parameter(kwargs, "limit", 0),
                 other_conditions = {"test":"cnlab.test"}
             ),metadata = get_auth_headers())
@@ -55,16 +60,16 @@ class Level0DataApi(object):
 
         parameter kwargs:
             id : [int],
-            level0_id: [str]
+            level0_id: [str],
+            obs_type: [str]
 
         return csst_dfs_common.models.Result
         '''
         try:
-            id = get_parameter(kwargs, "id")
-            level0_id = get_parameter(kwargs, "level0_id")
             resp, _ =  self.stub.Get.with_call(level0_pb2.GetLevel0DataReq(
-                id = id,
-                level0_id = level0_id
+                id = get_parameter(kwargs, "id"),
+                level0_id = get_parameter(kwargs, "level0_id"),
+                obs_type = get_parameter(kwargs, "obs_type")
             ),metadata = get_auth_headers())
 
             if resp.record is None or resp.record.id == 0:
@@ -81,19 +86,20 @@ class Level0DataApi(object):
         parameter kwargs:
             id : [int],
             level0_id: [str],
+            obs_type: [str],
             status : [int]
 
         return csst_dfs_common.models.Result
         '''
-        id = get_parameter(kwargs, "id")
-        level0_id = get_parameter(kwargs, "level0_id")
         status = get_parameter(kwargs, "status")
         try:
             resp,_ = self.stub.UpdateProcStatus.with_call(
                 level0_pb2.UpdateProcStatusReq(
-                    id=id,
-                    level0_id = level0_id,
-                    status=status),
+                    id = get_parameter(kwargs, "id"),
+                    level0_id = get_parameter(kwargs, "level0_id"),
+                    obs_type = get_parameter(kwargs, "obs_type"),
+                    status=get_parameter(kwargs, "status")
+                ),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -109,17 +115,18 @@ class Level0DataApi(object):
         parameter kwargs:
             id : [int],
             level0_id: [str],
+            obs_type: [str],
             status : [int]
         '''        
-        id = get_parameter(kwargs, "id")
-        level0_id = get_parameter(kwargs, "level0_id")
-        status = get_parameter(kwargs, "status")
+
         try:
             resp,_ = self.stub.UpdateQc0Status.with_call(
                 level0_pb2.UpdateQc0StatusReq( 
-                    id=id,
-                    level0_id = level0_id,
-                    status=status),
+                    id = get_parameter(kwargs, "id"),
+                    level0_id = get_parameter(kwargs, "level0_id"),
+                    obs_type = get_parameter(kwargs, "obs_type"),
+                    status=get_parameter(kwargs, "status")
+                ),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -155,7 +162,7 @@ class Level0DataApi(object):
         )
         req = level0_pb2.WriteLevel0DataReq(record = rec)
         try:
-            resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
+            resp,_ = self.stub.Write.with_call(req, metadata = get_auth_headers())
             if resp.success:
                 return Result.ok_data(data = Level0Record().from_proto_model(resp.record))
             else:

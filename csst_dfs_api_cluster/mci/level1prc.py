@@ -2,22 +2,22 @@ import grpc
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
-from csst_dfs_commons.models.msc import Level0PrcRecord
+from csst_dfs_commons.models.ifs import Level1PrcRecord
 
-from csst_dfs_proto.msc.level0prc import level0prc_pb2, level0prc_pb2_grpc
+from csst_dfs_proto.ifs.level1prc import level1prc_pb2, level1prc_pb2_grpc
 
 from ..common.service import ServiceProxy
 from ..common.utils import *
 
-class Level0PrcApi(object):
+class Level1PrcApi(object):
     def __init__(self):
-        self.stub = level0prc_pb2_grpc.Level0PrcSrvStub(ServiceProxy().channel())
+        self.stub = level1prc_pb2_grpc.Level1PrcSrvStub(ServiceProxy().channel())
 
     def find(self, **kwargs):
-        ''' retrieve level0 procedure records from database
+        ''' retrieve level1 procedure records from database
 
         parameter kwargs:
-            level0_id: [str]
+            level1_id: [str]
             pipeline_id: [str]
             prc_module: [str]
             prc_status : [int]
@@ -25,8 +25,8 @@ class Level0PrcApi(object):
         return: csst_dfs_common.models.Result
         '''
         try:
-            resp, _ =  self.stub.Find.with_call(level0prc_pb2.FindLevel0PrcReq(
-                level0_id = get_parameter(kwargs, "level0_id"),
+            resp, _ =  self.stub.Find.with_call(level1prc_pb2.FindLevel1PrcReq(
+                level1_id = get_parameter(kwargs, "level1_id"),
                 pipeline_id = get_parameter(kwargs, "pipeline_id"),
                 prc_module = get_parameter(kwargs, "prc_module"),
                 prc_status = get_parameter(kwargs, "prc_status"),
@@ -34,7 +34,7 @@ class Level0PrcApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
-                return Result.ok_data(data = from_proto_model_list(Level0PrcRecord, resp.records)).append("totalCount", resp.totalCount)
+                return Result.ok_data(data = from_proto_model_list(Level1PrcRecord, resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
@@ -55,7 +55,7 @@ class Level0PrcApi(object):
 
         try:
             resp,_ = self.stub.UpdateProcStatus.with_call(
-                level0prc_pb2.UpdateProcStatusReq(id=id, status=status),
+                level1prc_pb2.UpdateProcStatusReq(id=id, status=status),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -66,10 +66,10 @@ class Level0PrcApi(object):
             return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def write(self, **kwargs):
-        ''' insert a level0 procedure record into database
+        ''' insert a level1 procedure record into database
  
         parameter kwargs:
-            level0_id : [str]
+            level1_id : [int]
             pipeline_id : [str]
             prc_module : [str]
             params_file_path : [str]
@@ -79,9 +79,9 @@ class Level0PrcApi(object):
         return csst_dfs_common.models.Result
         '''   
 
-        rec = level0prc_pb2.Level0PrcRecord(
+        rec = level1prc_pb2.Level1PrcRecord(
             id = 0,
-            level0_id = get_parameter(kwargs, "level0_id"),
+            level1_id = get_parameter(kwargs, "level1_id"),
             pipeline_id = get_parameter(kwargs, "pipeline_id"),
             prc_module = get_parameter(kwargs, "prc_module"),
             params_file_path = get_parameter(kwargs, "params_file_path"),
@@ -89,11 +89,11 @@ class Level0PrcApi(object):
             prc_time = get_parameter(kwargs, "prc_time"),
             result_file_path = get_parameter(kwargs, "result_file_path")
         )
-        req = level0prc_pb2.WriteLevel0PrcReq(record = rec)
+        req = level1prc_pb2.WriteLevel1PrcReq(record = rec)
         try:
             resp,_ = self.stub.Write.with_call(req,metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data = Level0PrcRecord().from_proto_model(resp.record))
+                return Result.ok_data(data = Level1PrcRecord().from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
