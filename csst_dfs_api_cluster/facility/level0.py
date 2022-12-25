@@ -55,6 +55,27 @@ class Level0DataApi(object):
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
+    def find_by_brick_ids(self, **kwargs):
+        ''' retrieve level0 records by brick_ids like [1,2,3,4]
+
+        :param kwargs: Parameter dictionary, key items support:
+            brick_ids: [list]
+
+        return: csst_dfs_common.models.Result
+        '''
+        try:
+            resp, _ =  self.stub.FindByBrickIds.with_call(level0_pb2.FindByBrickIdsReq(
+                brick_ids = get_parameter(kwargs, "brick_ids", [])
+            ),metadata = get_auth_headers())
+
+            if resp.success:
+                return Result.ok_data(data=from_proto_model_list(Level0Record, resp.records))
+            else:
+                return Result.error(message = str(resp.error.detail))
+
+        except grpc.RpcError as e:
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
+
     def get(self, **kwargs):
         '''  fetch a record from database
 
