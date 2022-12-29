@@ -27,7 +27,9 @@ class CatalogApi(object):
             return: csst_dfs_common.models.Result
         ''' 
         try:
-            resps, _ = self.stub.Gaia3Search(ephem_pb2.EphemSearchRequest(
+            records = []
+            totalCount = 0
+            for resp in self.stub.Gaia3Search(ephem_pb2.EphemSearchRequest(
                 ra = ra,
                 dec = dec,
                 radius = radius,
@@ -35,10 +37,7 @@ class CatalogApi(object):
                 maxMag = max_mag,
                 obstime = obstime,
                 limit = limit
-            ),metadata = get_auth_headers())
-            records = []
-            totalCount = 0
-            for resp in resps:
+            ),metadata = get_auth_headers()):
                 if resp.success:
                     data = from_proto_model_list(Gaia3Record, resp.records)
                     records.extend(data)
