@@ -1,5 +1,5 @@
 import grpc
-import time
+from collections import deque
 import logging
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list, Gaia3Record
@@ -27,7 +27,7 @@ class CatalogApi(object):
             return: csst_dfs_common.models.Result
         ''' 
         try:
-            records = []
+            records = deque([])
             totalCount = 0
             for resp in self.stub.Gaia3Search(ephem_pb2.EphemSearchRequest(
                 ra = ra,
@@ -44,7 +44,6 @@ class CatalogApi(object):
                     totalCount = resp.totalCount
                 else:
                     return Result.error(message = str(resp.error.detail))
-            return Result.ok_data(data = records).append("totalCount", totalCount)
+            return Result.ok_data(data = list(records)).append("totalCount", totalCount)
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))
-
