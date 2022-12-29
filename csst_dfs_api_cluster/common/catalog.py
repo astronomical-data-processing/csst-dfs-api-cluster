@@ -27,8 +27,7 @@ class CatalogApi(object):
             return: csst_dfs_common.models.Result
         ''' 
         try:
-            t_start = time.time()
-            resp, _ = self.stub.Gaia3Search.with_call(ephem_pb2.EphemSearchRequest(
+            resps, _ = self.stub.Gaia3Search.with_call(ephem_pb2.EphemSearchRequest(
                 ra = ra,
                 dec = dec,
                 radius = radius,
@@ -37,17 +36,16 @@ class CatalogApi(object):
                 obstime = obstime,
                 limit = limit
             ),metadata = get_auth_headers())
-            t_end = time.time()
-            log.info("gaia3_query used: %.6f's" %(t_end - t_start,)) 
-            if resp.success:
-                t_start = time.time()
-                data = from_proto_model_list(Gaia3Record, resp.records)
-                t_end = time.time()
-                # log.info("object deserialization used: %.6f's" %(t_end - t_start,))  
-                return Result.ok_data(data = data).append("totalCount", resp.totalCount)
-            else:
-                return Result.error(message = str(resp.error.detail))
-
+            records = []
+            totalCount = 0
+            for resp in resps:
+                if resp.success:
+                    data = from_proto_model_list(Gaia3Record, resp.records)
+                    records.extend(data)
+                    totalCount = resp.totalCount
+                else:
+                    return Result.error(message = str(resp.error.detail))
+            return Result.ok_data(data = records).append("totalCount", totalCount)
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
