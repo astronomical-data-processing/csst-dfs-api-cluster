@@ -27,7 +27,7 @@ class CatalogApi(object):
             return: csst_dfs_common.models.Result
         ''' 
         try:
-            resps, _ = self.stub.Gaia3Search.with_call(ephem_pb2.EphemSearchRequest(
+            resps, _ = self.stub.Gaia3Search(ephem_pb2.EphemSearchRequest(
                 ra = ra,
                 dec = dec,
                 radius = radius,
