@@ -2,6 +2,9 @@ import grpc
 import pickle
 from collections import deque
 import logging
+import zlib
+import io
+
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list, Gaia3Record
 
@@ -28,7 +31,7 @@ class CatalogApi(object):
             return: csst_dfs_common.models.Result
         ''' 
         try:
-            datas = b''
+            datas = io.BytesIO()
             totalCount = 0
 
             resps = self.stub.Gaia3Search(ephem_pb2.EphemSearchRequest(
@@ -43,12 +46,12 @@ class CatalogApi(object):
             for resp in resps:
                 if resp.success:
                     # data = from_proto_model_list(Gaia3Record, resp.records)
-                    datas = datas + resp.records
+                    datas.write(resp.records)
                     totalCount = resp.totalCount
                 else:
                     return Result.error(message = str(resp.error.detail))
-                
-            records = pickle.loads(datas)
+            datas.flush()
+            records = pickle.loads(zlib.decompress(datas.getvalue()))
             ret_records2 = []
             for r in records:
                 rec = Gaia3Record()
