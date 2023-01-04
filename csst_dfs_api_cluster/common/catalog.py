@@ -2,7 +2,6 @@ import grpc
 import pickle
 from collections import deque
 import logging
-import zlib
 import io
 
 from csst_dfs_commons.models import Result
@@ -51,7 +50,7 @@ class CatalogApi(object):
                 else:
                     return Result.error(message = str(resp.error.detail))
             datas.flush()
-            records = pickle.loads(zlib.decompress(datas.getvalue()))
+            records = pickle.loads(datas.getvalue())
             ret_records2 = []
             for r in records:
                 rec = Gaia3Record()
