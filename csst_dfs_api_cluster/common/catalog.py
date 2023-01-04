@@ -39,7 +39,8 @@ class CatalogApi(object):
                 limit = limit
             ),metadata = get_auth_headers()):
                 if resp.success:
-                    data = from_proto_model_list(Gaia3Record, resp.records)
+                    # data = from_proto_model_list(Gaia3Record, resp.records)
+                    data = resp.records
                     records.extend(data)
                     totalCount = resp.totalCount
                 else:
