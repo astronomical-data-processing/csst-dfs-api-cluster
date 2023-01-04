@@ -30,7 +30,8 @@ class CatalogApi(object):
         try:
             datas = b''
             totalCount = 0
-            for resp in self.stub.Gaia3Search(ephem_pb2.EphemSearchRequest(
+
+            resps = self.stub.Gaia3Search(ephem_pb2.EphemSearchRequest(
                 ra = ra,
                 dec = dec,
                 radius = radius,
@@ -38,14 +39,15 @@ class CatalogApi(object):
                 maxMag = max_mag,
                 obstime = obstime,
                 limit = limit
-            ),metadata = get_auth_headers()):
+            ),metadata = get_auth_headers())
+            for resp in resps:
                 if resp.success:
                     # data = from_proto_model_list(Gaia3Record, resp.records)
                     datas = datas + resp.records
                     totalCount = resp.totalCount
                 else:
                     return Result.error(message = str(resp.error.detail))
-            
+                
             records = pickle.loads(datas)
             ret_records2 = []
             for r in records:
@@ -208,7 +210,6 @@ class CatalogApi(object):
                 rec.NS64HIdx = r[155]
                 rec.FileIdx = r[156]
                 ret_records2.append(rec)
-
             return Result.ok_data(data = ret_records2).append("totalCount", totalCount)
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))
