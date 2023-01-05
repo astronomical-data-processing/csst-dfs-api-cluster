@@ -3,6 +3,7 @@ import pickle
 from collections import deque
 import logging
 import io
+import time
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list, Gaia3Record
@@ -32,7 +33,7 @@ class CatalogApi(object):
         try:
             datas = io.BytesIO()
             totalCount = 0
-
+            t_start = time.time()
             resps = self.stub.Gaia3Search(ephem_pb2.EphemSearchRequest(
                 ra = ra,
                 dec = dec,
@@ -50,7 +51,11 @@ class CatalogApi(object):
                 else:
                     return Result.error(message = str(resp.error.detail))
             datas.flush()
+            log.info("received used: %.6f's" %(time.time() - t_start,))
+            t_start = time.time()
             records = pickle.loads(datas.getvalue())
+            log.info("unserialization used: %.6f's" %(time.time() - t_start,))
+            t_start = time.time()
             ret_records2 = []
             for r in records:
                 rec = Gaia3Record()
@@ -212,6 +217,7 @@ class CatalogApi(object):
                 rec.NS64HIdx = r[155]
                 rec.FileIdx = r[156]
                 ret_records2.append(rec)
+            log.info("to object list used: %.6f's" %(time.time() - t_start,))
             return Result.ok_data(data = ret_records2).append("totalCount", totalCount)
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))
