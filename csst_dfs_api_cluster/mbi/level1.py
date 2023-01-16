@@ -93,7 +93,7 @@ class Level1DataApi(object):
                 return Result.error(message=f"data not found")  
 
             return Result.ok_data(data = Level1Record().from_proto_model(resp.record))
-           
+
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))   
 
@@ -143,7 +143,7 @@ class Level1DataApi(object):
 
     def write(self, **kwargs):
         ''' insert a level1 record into database
- 
+
         parameter kwargs:
             level0_id : [str]
             data_type : [str]
