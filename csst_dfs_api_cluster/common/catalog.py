@@ -1,12 +1,9 @@
 import grpc
 import pickle
-from collections import deque
 import logging
 import io
-import time
 
 from csst_dfs_commons.models import Result
-from csst_dfs_commons.models.common import from_proto_model_list, Gaia3Record
 
 from csst_dfs_proto.common.ephem import ephem_pb2, ephem_pb2_grpc
 from .service import ServiceProxy
@@ -34,7 +31,6 @@ class CatalogApi(object):
         try:
             datas = io.BytesIO()
             totalCount = 0
-            t_start = time.time()
             resps = self.stub.Gaia3Search(ephem_pb2.EphemSearchRequest(
                 ra = ra,
                 dec = dec,
@@ -47,16 +43,12 @@ class CatalogApi(object):
             ),metadata = get_auth_headers())
             for resp in resps:
                 if resp.success:
-                    # data = from_proto_model_list(Gaia3Record, resp.records)
                     datas.write(resp.records)
                     totalCount = resp.totalCount
                 else:
                     return Result.error(message = str(resp.error.detail))
             datas.flush()
-            log.info("received used: %.6f's" %(time.time() - t_start,))
-            t_start = time.time()
             records = pickle.loads(datas.getvalue())
-            log.info("unserialization used: %.6f's" %(time.time() - t_start,))
 
             return Result.ok_data(data = records).append("totalCount", totalCount).append("columns", columns)
         except grpc.RpcError as e:
