@@ -89,7 +89,7 @@ class Level1DataApi(object):
         return: csst_dfs_common.models.Result
         '''
         try:
-            resp, _ =  self.stub.Find.with_call(level1_pb2.FindLevel1Req(
+            resp, _ =  self.stub.FindByPrcStatus.with_call(level1_pb2.FindLevel1Req(
                 level0_id = None,
                 data_type = None,
                 create_time_start = None,
