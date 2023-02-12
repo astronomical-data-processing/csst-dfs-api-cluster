@@ -20,9 +20,10 @@ class Level0DataApi(object):
             obs_id: [str]
             detector_no: [str]
             obs_type: [str]
-            obs_time : (start, end),
-            qc0_status : [int],
-            prc_status : [int],
+            filter: [str]
+            obs_time : (start, end)
+            qc0_status : [int]
+            prc_status : [int]
             file_name: [str]
             limit: limits returns the number of records,default 0:no-limit
 
@@ -43,6 +44,7 @@ class Level0DataApi(object):
                 radius = get_parameter(kwargs, "radius", 0),
                 object_name = get_parameter(kwargs, "object_name", None),
                 version = get_parameter(kwargs, "version", None),
+                filter = get_parameter(kwargs, "filter", None),
                 limit = get_parameter(kwargs, "limit", 0),
                 other_conditions = {"test":"cnlab.test"}
             ),metadata = get_auth_headers())

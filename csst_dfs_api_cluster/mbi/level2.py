@@ -61,6 +61,7 @@ class Level2DataApi(object):
         parameter kwargs:
             obs_id: [str]
             detector_no: [str]
+            filter: [str]
             ra:  [float] in deg
             dec: [float] in deg
             radius:  [float] in deg   
@@ -71,8 +72,9 @@ class Level2DataApi(object):
         '''
         try:
             resp, _ =  self.stub.FindCatalog.with_call(level2_pb2.FindLevel2CatalogReq(
-                obs_id = get_parameter(kwargs, "obs_id"),
-                detector_no = get_parameter(kwargs, "detector_no"),
+                obs_id = get_parameter(kwargs, "obs_id", None),
+                detector_no = get_parameter(kwargs, "detector_no", None),
+                filter = get_parameter(kwargs, "filter", None),
                 obs_time_start = get_parameter(kwargs, "obs_time", [None, None])[0],
                 obs_time_end = get_parameter(kwargs, "obs_time", [None, None])[1],
                 ra = get_parameter(kwargs, "ra"),
@@ -97,6 +99,7 @@ class Level2DataApi(object):
         parameter kwargs:
             obs_id: [str]
             detector_no: [str]
+            filter: [str]
             ra:  [float] in deg
             dec: [float] in deg
             radius:  [float] in deg   
@@ -109,6 +112,7 @@ class Level2DataApi(object):
             resp, _ =  self.stub.FindCatalogFile.with_call(level2_pb2.FindLevel2CatalogReq(
                 obs_id = get_parameter(kwargs, "obs_id"),
                 detector_no = get_parameter(kwargs, "detector_no"),
+                filter = get_parameter(kwargs, "filter", None),
                 obs_time_start = get_parameter(kwargs, "obs_time", [None, None])[0],
                 obs_time_end = get_parameter(kwargs, "obs_time", [None, None])[1],
                 ra = get_parameter(kwargs, "ra"),
