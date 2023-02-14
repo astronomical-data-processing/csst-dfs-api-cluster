@@ -17,14 +17,20 @@ class Level0DataApi(object):
         ''' retrieve level0 records from database
 
         parameter kwargs:
-            obs_id: [str]
-            detector_no: [str]
-            obs_type: [str]
-            filter: [str]
-            obs_time : (start, end)
-            qc0_status : [int]
-            prc_status : [int]
-            file_name: [str]
+            obs_id: [str],
+            module_id: [str]
+            detector_no: [str],
+            obs_type: [str],
+            filter: [str],
+            obs_time : (start, end),
+            qc0_status : [int],
+            prc_status : [int],
+            file_name: [str],
+            ra_obj: [float],
+            dec_obj: [float],
+            radius: [float],
+            object_name: [str],
+            version: [str],
             limit: limits returns the number of records,default 0:no-limit
 
         return: csst_dfs_common.models.Result
@@ -33,6 +39,7 @@ class Level0DataApi(object):
             resp, _ =  self.stub.Find.with_call(level0_pb2.FindLevel0DataReq(
                 obs_id = get_parameter(kwargs, "obs_id"),
                 detector_no = get_parameter(kwargs, "detector_no"),
+                module_id = get_parameter(kwargs, "module_id"),
                 obs_type = get_parameter(kwargs, "obs_type"),
                 exp_time_start = get_parameter(kwargs, "obs_time", [None, None])[0],
                 exp_time_end = get_parameter(kwargs, "obs_time", [None, None])[1],

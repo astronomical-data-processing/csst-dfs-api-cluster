@@ -4,9 +4,9 @@ import datetime
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
-from csst_dfs_commons.models.mci import Level1Record
+from csst_dfs_commons.models.facility import Level1Record
 from csst_dfs_commons.models.constants import UPLOAD_CHUNK_SIZE
-from csst_dfs_proto.mci.level1 import level1_pb2, level1_pb2_grpc
+from csst_dfs_proto.facility.level1 import level1_pb2, level1_pb2_grpc
 
 from ..common.service import ServiceProxy
 from ..common.utils import *
@@ -23,6 +23,7 @@ class Level1DataApi(object):
 
         parameter kwargs:
             level0_id: [str]
+            module_id: [str]
             data_type: [str]
             create_time : (start, end),
             qc1_status : [int],
@@ -35,6 +36,7 @@ class Level1DataApi(object):
         try:
             resp, _ =  self.stub.Find.with_call(level1_pb2.FindLevel1Req(
                 level0_id = get_parameter(kwargs, "level0_id"),
+                module_id = get_parameter(kwargs, "module_id"),
                 data_type = get_parameter(kwargs, "data_type"),
                 create_time_start = get_parameter(kwargs, "create_time", [None, None])[0],
                 create_time_end = get_parameter(kwargs, "create_time", [None, None])[1],
@@ -47,6 +49,27 @@ class Level1DataApi(object):
 
             if resp.success:
                 return Result.ok_data(data=from_proto_model_list(Level1Record, resp.records)).append("totalCount", resp.totalCount)
+            else:
+                return Result.error(message = str(resp.error.detail))
+
+        except grpc.RpcError as e:
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
+
+    def find_by_brick_ids(self, **kwargs):
+        ''' retrieve level1 records by brick_ids like [1,2,3,4]
+
+        :param kwargs: Parameter dictionary, key items support:
+            brick_ids: [list]
+
+        return: csst_dfs_common.models.Result
+        '''
+        try:
+            resp, _ =  self.stub.FindByBrickIds.with_call(level1_pb2.FindByBrickIdsReq(
+                brick_ids = get_parameter(kwargs, "brick_ids", [])
+            ),metadata = get_auth_headers())
+
+            if resp.success:
+                return Result.ok_data(data=from_proto_model_list(Level1Record, resp.records))
             else:
                 return Result.error(message = str(resp.error.detail))
 
@@ -71,8 +94,8 @@ class Level1DataApi(object):
             if resp.record is None or resp.record.id == 0:
                 return Result.error(message=f"data not found")  
 
-            return Result.ok_data(data=Level1Record().from_proto_model(resp.record))
-           
+            return Result.ok_data(data = Level1Record().from_proto_model(resp.record))
+
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))   
 
@@ -122,7 +145,7 @@ class Level1DataApi(object):
 
     def write(self, **kwargs):
         ''' insert a level1 record into database
- 
+
         parameter kwargs:
             level0_id : [str]
             data_type : [str]
@@ -141,11 +164,12 @@ class Level1DataApi(object):
         rec = level1_pb2.Level1Record(
             id = 0,
             level0_id = get_parameter(kwargs, "level0_id"),
+            module_id = get_parameter(kwargs, "module_id", ''),
             data_type = get_parameter(kwargs, "data_type"),
             cor_sci_id = get_parameter(kwargs, "cor_sci_id"),
             prc_params = get_parameter(kwargs, "prc_params"),
-            filename = get_parameter(kwargs, "filename"),
-            file_path = get_parameter(kwargs, "file_path"),
+            filename = get_parameter(kwargs, "filename", ""),
+            file_path = get_parameter(kwargs, "file_path", ""),
             prc_status = get_parameter(kwargs, "prc_status", -1),
             prc_time = get_parameter(kwargs, "prc_time", format_datetime(datetime.now())),
             pipeline_id = get_parameter(kwargs, "pipeline_id"),
@@ -158,7 +182,6 @@ class Level1DataApi(object):
                     if not data:
                         break
                     yield level1_pb2.WriteLevel1Req(record = rec, data = data)
-
         try:
             if not rec.file_path:
                 return Result.error(message="file_path is blank")
