@@ -22,10 +22,11 @@ class Level2SpectraApi(object):
         ''' retrieve level2spectra records from database
 
         :param kwargs: Parameter dictionary, key items support:
+            level0_id: [str]
             level1_id: [int]
             spectra_id: [str]
             create_time : (start, end),
-            qc1_status : [int],
+            qc2_status : [int],
             prc_status : [int],
             filename: [str]
             limit: limits returns the number of records,default 0:no-limit
@@ -34,11 +35,12 @@ class Level2SpectraApi(object):
         '''
         try:
             resp, _ =  self.stub.Find.with_call(level2spectra_pb2.FindLevel2spectraReq(
+                level0_id = get_parameter(kwargs, "level0_id",None),
                 level1_id = get_parameter(kwargs, "level1_id",0),
                 spectra_id = get_parameter(kwargs, "spectra_id"),
                 create_time_start = get_parameter(kwargs, "create_time", [None, None])[0],
                 create_time_end = get_parameter(kwargs, "create_time", [None, None])[1],
-                qc1_status = get_parameter(kwargs, "qc1_status"),
+                qc2_status = get_parameter(kwargs, "qc2_status"),
                 prc_status = get_parameter(kwargs, "prc_status"),
                 filename = get_parameter(kwargs, "filename"),
                 limit = get_parameter(kwargs, "limit", 0),
@@ -98,8 +100,8 @@ class Level2SpectraApi(object):
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
-    def update_qc1_status(self, **kwargs):
-        ''' update the status of QC0
+    def update_qc2_status(self, **kwargs):
+        ''' update the status of QC2
         
         parameter kwargs:
             id : [int],
@@ -108,8 +110,8 @@ class Level2SpectraApi(object):
         fits_id = get_parameter(kwargs, "id")
         status = get_parameter(kwargs, "status")
         try:
-            resp,_ = self.stub.UpdateQc1Status.with_call(
-                level2spectra_pb2.UpdateQc1StatusReq(id=fits_id, status=status),
+            resp,_ = self.stub.UpdateQc2Status.with_call(
+                level2spectra_pb2.UpdateQc2StatusReq(id=fits_id, status=status),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -123,6 +125,7 @@ class Level2SpectraApi(object):
         ''' insert a level2spectra record into database
  
         parameter kwargs:
+            level0_id: [str]
             level1_id: [int]
             spectra_id : [str]
             region : [str]
@@ -138,6 +141,7 @@ class Level2SpectraApi(object):
 
         rec = level2spectra_pb2.Level2spectraRecord(
             id = 0,
+            level0_id = get_parameter(kwargs, "level0_id", None),
             level1_id = get_parameter(kwargs, "level1_id", 0),
             spectra_id = get_parameter(kwargs, "spectra_id"),
             region = get_parameter(kwargs, "region"),
