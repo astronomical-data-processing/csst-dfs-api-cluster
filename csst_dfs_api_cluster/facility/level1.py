@@ -95,7 +95,7 @@ class Level1DataApi(object):
                 data_type = None,
                 create_time_start = None,
                 create_time_end = None,
-                qc1_status = get_parameter(kwargs, "prc_status", -1),
+                qc1_status = get_parameter(kwargs, "qc1_status", -1),
                 prc_status = None,
                 limit = get_parameter(kwargs, "limit", 1),
                 other_conditions = {"orderBy":"create_time asc", "module_id": 'SLS'}
