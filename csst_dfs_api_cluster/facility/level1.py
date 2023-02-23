@@ -44,7 +44,11 @@ class Level1DataApi(object):
                 prc_status = get_parameter(kwargs, "prc_status"),
                 filename = get_parameter(kwargs, "filename"),
                 limit = get_parameter(kwargs, "limit", 0),
-                other_conditions = {"test":"cnlab.test"}
+                other_conditions = {
+                    "ra_cen": str(get_parameter(kwargs, "ra_cen", '')),
+                    "dec_cen": str(get_parameter(kwargs, "dec_cen", '')),
+                    "radius_cen": str(get_parameter(kwargs, "radius_cen", ''))
+                }
             ),metadata = get_auth_headers())
 
             if resp.success:
@@ -70,6 +74,35 @@ class Level1DataApi(object):
 
             if resp.success:
                 return Result.ok_data(data=from_proto_model_list(Level1Record, resp.records))
+            else:
+                return Result.error(message = str(resp.error.detail))
+
+        except grpc.RpcError as e:
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
+
+    def sls_find_by_qc1_status(self, **kwargs):
+        ''' retrieve level1 records from database
+
+        parameter kwargs:
+            qc1_status: [str]
+            limit: limits returns the number of records,default 1
+
+        return: csst_dfs_common.models.Result
+        '''
+        try:
+            resp, _ =  self.stub.FindByQc1Status.with_call(level1_pb2.FindLevel1Req(
+                level0_id = None,
+                data_type = None,
+                create_time_start = None,
+                create_time_end = None,
+                qc1_status = get_parameter(kwargs, "prc_status", -1),
+                prc_status = None,
+                limit = get_parameter(kwargs, "limit", 1),
+                other_conditions = {"orderBy":"create_time asc", "module_id": 'SLS'}
+            ),metadata = get_auth_headers())
+
+            if resp.success:
+                return Result.ok_data(data=from_proto_model_list(Level1Record, resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
