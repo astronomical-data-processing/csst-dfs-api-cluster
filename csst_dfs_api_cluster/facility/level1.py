@@ -40,8 +40,8 @@ class Level1DataApi(object):
                 data_type = get_parameter(kwargs, "data_type"),
                 create_time_start = get_parameter(kwargs, "create_time", [None, None])[0],
                 create_time_end = get_parameter(kwargs, "create_time", [None, None])[1],
-                qc1_status = get_parameter(kwargs, "qc1_status"),
-                prc_status = get_parameter(kwargs, "prc_status"),
+                qc1_status = get_parameter(kwargs, "qc1_status", 1024),
+                prc_status = get_parameter(kwargs, "prc_status", 1024),
                 filename = get_parameter(kwargs, "filename"),
                 limit = get_parameter(kwargs, "limit", 0),
                 other_conditions = {
