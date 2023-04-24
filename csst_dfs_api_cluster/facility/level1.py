@@ -44,6 +44,7 @@ class Level1DataApi(object):
                 prc_status = get_parameter(kwargs, "prc_status", 1024),
                 filename = get_parameter(kwargs, "filename"),
                 limit = get_parameter(kwargs, "limit", 0),
+                pipeline_id = get_parameter(kwargs, "pipeline_id", ""),
                 detector_no = get_parameter(kwargs, "detector_no", ""),
                 other_conditions = {
                     "ra_cen": str(get_parameter(kwargs, "ra_cen", '')),
