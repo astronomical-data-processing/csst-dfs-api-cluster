@@ -46,6 +46,7 @@ class Level1DataApi(object):
                 limit = get_parameter(kwargs, "limit", 0),
                 pipeline_id = get_parameter(kwargs, "pipeline_id", ""),
                 detector_no = get_parameter(kwargs, "detector_no", ""),
+                filter = get_parameter(kwargs, "filter", ""),
                 other_conditions = {
                     "ra_cen": str(get_parameter(kwargs, "ra_cen", '')),
                     "dec_cen": str(get_parameter(kwargs, "dec_cen", '')),
