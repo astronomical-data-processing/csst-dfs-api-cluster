@@ -4,6 +4,8 @@ import grpc
 import datetime
 import pickle
 
+from collections import Iterable
+
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
 from csst_dfs_commons.models.msc import Level2Record,Level2CatalogRecord
@@ -75,9 +77,14 @@ class Level2DataApi(object):
         '''
         try:
             datas = io.BytesIO()
-            totalCount = 0            
+            totalCount = 0         
+            
+            brick_ids = get_parameter(kwargs, "brick_ids", [])
+            if not isinstance(brick_ids,Iterable):
+                brick_ids = [brick_ids]
+
             resps =  self.stub.FindCatalog(level2_pb2.FindLevel2CatalogReq(
-                brick_ids = ",".join([str(i) for i in get_parameter(kwargs, "brick_ids", [])]),
+                brick_ids = ",".join([str(i) for i in brick_ids]),
                 obs_id = get_parameter(kwargs, "obs_id", None),
                 detector_no = get_parameter(kwargs, "detector_no", None),
                 filter = get_parameter(kwargs, "filter", None),
@@ -121,8 +128,13 @@ class Level2DataApi(object):
         return: csst_dfs_common.models.Result
         '''
         try:
+
+            brick_ids = get_parameter(kwargs, "brick_ids", [])
+            if not isinstance(brick_ids,Iterable):
+                brick_ids = [brick_ids]
+
             resp, _ =  self.stub.FindCatalogFile.with_call(level2_pb2.FindLevel2CatalogReq(
-                brick_ids = ",".join([str(i) for i in get_parameter(kwargs, "brick_ids", [])]),
+                brick_ids = ",".join([str(i) for i in brick_ids]),
                 obs_id = get_parameter(kwargs, "obs_id"),
                 detector_no = get_parameter(kwargs, "detector_no"),
                 filter = get_parameter(kwargs, "filter", None),
