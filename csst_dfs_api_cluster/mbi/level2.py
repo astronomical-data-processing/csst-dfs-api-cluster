@@ -151,7 +151,7 @@ class Level2DataApi(object):
         return: csst_dfs_common.models.Result
         '''
         try:
-            resp, _ =  self.stub.FindExistedBricks(level2_pb2.FindExistedBricksReq(),metadata = get_auth_headers())
+            resp =  self.stub.FindExistedBricks(level2_pb2.FindExistedBricksReq(),metadata = get_auth_headers())
 
             if resp.success:
                 return Result.ok_data(data = resp.brick_ids)
