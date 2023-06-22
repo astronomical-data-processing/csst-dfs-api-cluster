@@ -77,7 +77,7 @@ class Level2DataApi(object):
             datas = io.BytesIO()
             totalCount = 0            
             resps =  self.stub.FindCatalog(level2_pb2.FindLevel2CatalogReq(
-                brick_ids = ",".join(get_parameter(kwargs, "brick_ids", [])),
+                brick_ids = ",".join([str(i) for i in get_parameter(kwargs, "brick_ids", [])]),
                 obs_id = get_parameter(kwargs, "obs_id", None),
                 detector_no = get_parameter(kwargs, "detector_no", None),
                 filter = get_parameter(kwargs, "filter", None),
@@ -122,7 +122,7 @@ class Level2DataApi(object):
         '''
         try:
             resp, _ =  self.stub.FindCatalogFile.with_call(level2_pb2.FindLevel2CatalogReq(
-                brick_ids = get_parameter(kwargs, "brick_ids", []),
+                brick_ids = ",".join([str(i) for i in get_parameter(kwargs, "brick_ids", [])]),
                 obs_id = get_parameter(kwargs, "obs_id"),
                 detector_no = get_parameter(kwargs, "detector_no"),
                 filter = get_parameter(kwargs, "filter", None),
@@ -151,7 +151,7 @@ class Level2DataApi(object):
         return: csst_dfs_common.models.Result
         '''
         try:
-            resp, _ =  self.stub.FindExistedBricks.with_call(level2_pb2.FindExistedBricksReq(),metadata = get_auth_headers())
+            resp, _ =  self.stub.FindExistedBricks(level2_pb2.FindExistedBricksReq(),metadata = get_auth_headers())
 
             if resp.success:
                 return Result.ok_data(data = resp.brick_ids)
