@@ -4,7 +4,7 @@ import grpc
 import datetime
 import pickle
 
-from collections import Iterable
+from collections.abc import Iterable
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
@@ -130,7 +130,7 @@ class Level2DataApi(object):
         try:
 
             brick_ids = get_parameter(kwargs, "brick_ids", [])
-            if not isinstance(brick_ids,Iterable):
+            if not isinstance(brick_ids, Iterable):
                 brick_ids = [brick_ids]
 
             resp, _ =  self.stub.FindCatalogFile.with_call(level2_pb2.FindLevel2CatalogReq(
