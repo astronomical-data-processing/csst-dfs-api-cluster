@@ -35,6 +35,7 @@ class Level1DataApi(object):
         '''
         try:
             resp, _ =  self.stub.Find.with_call(level1_pb2.FindLevel1Req(
+                obs_id = get_parameter(kwargs, "obs_id"),
                 level0_id = get_parameter(kwargs, "level0_id"),
                 module_id = get_parameter(kwargs, "module_id"),
                 data_type = get_parameter(kwargs, "data_type"),
