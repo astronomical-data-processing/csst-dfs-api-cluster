@@ -201,16 +201,16 @@ class Level1DataApi(object):
 
         rec = level1_pb2.Level1Record(
             id = 0,
-            level0_id = get_parameter(kwargs, "level0_id"),
-            module_id = get_parameter(kwargs, "module_id", ''),
-            data_type = get_parameter(kwargs, "data_type"),
-            cor_sci_id = get_parameter(kwargs, "cor_sci_id"),
-            prc_params = get_parameter(kwargs, "prc_params"),
+            level0_id = get_parameter(kwargs, "level0_id", ""),
+            module_id = get_parameter(kwargs, "module_id", ""),
+            data_type = get_parameter(kwargs, "data_type", ""),
+            cor_sci_id = get_parameter(kwargs, "cor_sci_id", 0),
+            prc_params = get_parameter(kwargs, "prc_params", ""),
             filename = get_parameter(kwargs, "filename", ""),
             file_path = get_parameter(kwargs, "file_path", ""),
             prc_status = get_parameter(kwargs, "prc_status", -1),
             prc_time = get_parameter(kwargs, "prc_time", format_datetime(datetime.now())),
-            pipeline_id = get_parameter(kwargs, "pipeline_id"),
+            pipeline_id = get_parameter(kwargs, "pipeline_id", ""),
             refs = get_parameter(kwargs, "refs", {})
         )
         def stream(rec):
