@@ -23,7 +23,6 @@ class Level2CoApi(object):
         ''' retrieve level2 records from database
 
         parameter kwargs:
-            level0_id: [str]
             data_type: [str]
             create_time : (start, end),
             qc2_status : [int],
@@ -158,7 +157,7 @@ class Level2CoApi(object):
 
     def write(self, **kwargs):
         ''' insert a level2 record into database
- 
+
         parameter kwargs:
             data_type : [str]
             filename : [str]
