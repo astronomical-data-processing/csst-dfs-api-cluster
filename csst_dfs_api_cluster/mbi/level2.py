@@ -107,7 +107,7 @@ class Level2DataApi(object):
                     return Result.error(message = str(resp.error.detail))
             datas.flush()
             records = pickle.loads(datas.getvalue())
-            return Result.ok_data(data = records).append("totalCount", totalCount)
+            return Result.ok_data(data = records[0]).append("totalCount", totalCount).append("columns", records[1])
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
