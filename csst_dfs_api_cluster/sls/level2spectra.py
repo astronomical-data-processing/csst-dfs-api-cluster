@@ -24,7 +24,7 @@ class Level2SpectraApi(object):
         :param kwargs: Parameter dictionary, key items support:
             level0_id: [str]
             level1_id: [int]
-            spectra_id: [str]
+            file_type: [str]
             create_time : (start, end),
             qc2_status : [int],
             prc_status : [int],
@@ -37,7 +37,7 @@ class Level2SpectraApi(object):
             resp, _ =  self.stub.Find.with_call(level2spectra_pb2.FindLevel2spectraReq(
                 level0_id = get_parameter(kwargs, "level0_id",None),
                 level1_id = get_parameter(kwargs, "level1_id",0),
-                spectra_id = get_parameter(kwargs, "spectra_id"),
+                file_type = get_parameter(kwargs, "file_type"),
                 create_time_start = get_parameter(kwargs, "create_time", [None, None])[0],
                 create_time_end = get_parameter(kwargs, "create_time", [None, None])[1],
                 qc2_status = get_parameter(kwargs, "qc2_status"),
@@ -73,7 +73,7 @@ class Level2SpectraApi(object):
                 return Result.error(message=f"id:{fits_id} not found")  
 
             return Result.ok_data(data = Level2Spectra().from_proto_model(resp.record))
-           
+
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))   
 
@@ -123,12 +123,11 @@ class Level2SpectraApi(object):
 
     def write(self, **kwargs):
         ''' insert a level2spectra record into database
- 
+
         parameter kwargs:
             level0_id: [str]
             level1_id: [int]
-            spectra_id : [str]
-            region : [str]
+            file_type : [str]
             filename : [str]
             file_path : [str]            
             prc_status : [int]
@@ -143,8 +142,7 @@ class Level2SpectraApi(object):
             id = 0,
             level0_id = get_parameter(kwargs, "level0_id", None),
             level1_id = get_parameter(kwargs, "level1_id", 0),
-            spectra_id = get_parameter(kwargs, "spectra_id"),
-            region = get_parameter(kwargs, "region"),
+            file_type = get_parameter(kwargs, "file_type"),
             filename = get_parameter(kwargs, "filename", ""),
             file_path = get_parameter(kwargs, "file_path", ""),
             prc_status = get_parameter(kwargs, "prc_status", -1),
