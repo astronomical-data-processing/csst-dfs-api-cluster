@@ -85,6 +85,27 @@ class Level1DataApi(object):
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
+    def find_by_ids(self, **kwargs):
+        ''' retrieve level1 records by internal level1 ids like [1,2,3,4]
+
+        :param kwargs: Parameter dictionary, key items support:
+            brick_ids: [list]
+
+        return: csst_dfs_common.models.Result
+        '''
+        try:
+            resp, _ =  self.stub.FindByIds.with_call(level1_pb2.FindByIdsReq(
+                ids = get_parameter(kwargs, "ids", [])
+            ),metadata = get_auth_headers())
+
+            if resp.success:
+                return Result.ok_data(data=from_proto_model_list(Level1Record, resp.records))
+            else:
+                return Result.error(message = str(resp.error.detail))
+
+        except grpc.RpcError as e:
+            return Result.error(message="%s:%s" % (e.code().value, e.details()))
+        
     def sls_find_by_qc1_status(self, **kwargs):
         ''' retrieve level1 records from database
 
