@@ -4,26 +4,27 @@ import datetime
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
-from csst_dfs_commons.models.sls import Level2Spectra
+from csst_dfs_commons.models.sls import Level2Data
 from csst_dfs_commons.models.constants import UPLOAD_CHUNK_SIZE
-from csst_dfs_proto.sls.level2spectra import level2spectra_pb2, level2spectra_pb2_grpc
+from csst_dfs_proto.hstdm.level2 import level2_pb2, level2_pb2_grpc
 
 from ..common.service import ServiceProxy
 from ..common.utils import *
 
-class Level2SpectraApi(object):
+class Level2DataApi(object):
     """
-    Level2spectra Data Operation Class
+    Level2 Data Operation Class
     """    
     def __init__(self):
-        self.stub = level2spectra_pb2_grpc.Level2spectraSrvStub(ServiceProxy().channel())
+        self.stub = level2_pb2_grpc.Level2SrvStub(ServiceProxy().channel())
 
     def find(self, **kwargs):
-        ''' retrieve level2spectra records from database
+        ''' retrieve level2 records from database
 
         :param kwargs: Parameter dictionary, key items support:
             level0_id: [str]
             level1_id: [int]
+            project_id: [int]
             file_type: [str]
             create_time : (start, end),
             qc2_status : [int],
@@ -34,9 +35,10 @@ class Level2SpectraApi(object):
         :returns: csst_dfs_common.models.Result
         '''
         try:
-            resp, _ =  self.stub.Find.with_call(level2spectra_pb2.FindLevel2spectraReq(
+            resp, _ =  self.stub.Find.with_call(level2_pb2.FindLevel2Req(
                 level0_id = get_parameter(kwargs, "level0_id",None),
-                level1_id = get_parameter(kwargs, "level1_id",0),
+                level1_id = get_parameter(kwargs, "level1_id", 0),
+                project_id = get_parameter(kwargs, "project_id", 0),
                 file_type = get_parameter(kwargs, "file_type"),
                 create_time_start = get_parameter(kwargs, "create_time", [None, None])[0],
                 create_time_end = get_parameter(kwargs, "create_time", [None, None])[1],
@@ -48,7 +50,7 @@ class Level2SpectraApi(object):
             ),metadata = get_auth_headers())
 
             if resp.success:
-                return Result.ok_data(data=from_proto_model_list(Level2Spectra, resp.records)).append("totalCount", resp.totalCount)
+                return Result.ok_data(data=from_proto_model_list(Level2Data, resp.records)).append("totalCount", resp.totalCount)
             else:
                 return Result.error(message = str(resp.error.detail))
 
@@ -60,19 +62,19 @@ class Level2SpectraApi(object):
 
         parameter kwargs:
             id : [int] 
-
+            
         return csst_dfs_common.models.Result
         '''
         try:
             fits_id = get_parameter(kwargs, "id")
-            resp, _ =  self.stub.Get.with_call(level2spectra_pb2.GetLevel2spectraReq(
+            resp, _ =  self.stub.Get.with_call(level2_pb2.GetLevel2Req(
                 id = fits_id
             ),metadata = get_auth_headers())
 
             if resp.record is None or resp.record.id == 0:
                 return Result.error(message=f"id:{fits_id} not found")  
 
-            return Result.ok_data(data = Level2Spectra().from_proto_model(resp.record))
+            return Result.ok_data(data = Level2Data().from_proto_model(resp.record))
 
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))   
@@ -90,7 +92,7 @@ class Level2SpectraApi(object):
         status = get_parameter(kwargs, "status")
         try:
             resp,_ = self.stub.UpdateProcStatus.with_call(
-                level2spectra_pb2.UpdateProcStatusReq(id=fits_id, status=status),
+                level2_pb2.UpdateProcStatusReq(id=fits_id, status=status),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -111,7 +113,7 @@ class Level2SpectraApi(object):
         status = get_parameter(kwargs, "status")
         try:
             resp,_ = self.stub.UpdateQc2Status.with_call(
-                level2spectra_pb2.UpdateQc2StatusReq(id=fits_id, status=status),
+                level2_pb2.UpdateQc2StatusReq(id=fits_id, status=status),
                 metadata = get_auth_headers()
             )
             if resp.success:
@@ -122,11 +124,12 @@ class Level2SpectraApi(object):
             return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
     def write(self, **kwargs):
-        ''' insert a level2spectra record into database
+        ''' insert a level2 record into database
 
         parameter kwargs:
             level0_id: [str]
             level1_id: [int]
+            project_id: [int]
             file_type : [str]
             filename : [str]
             file_path : [str]            
@@ -138,10 +141,11 @@ class Level2SpectraApi(object):
         return csst_dfs_common.models.Result
         '''   
 
-        rec = level2spectra_pb2.Level2spectraRecord(
+        rec = level2_pb2.Level2Record(
             id = 0,
             level0_id = get_parameter(kwargs, "level0_id", None),
             level1_id = get_parameter(kwargs, "level1_id", 0),
+            project_id = get_parameter(kwargs, "project_id", 0),
             file_type = get_parameter(kwargs, "file_type"),
             filename = get_parameter(kwargs, "filename", ""),
             file_path = get_parameter(kwargs, "file_path", ""),
@@ -155,7 +159,7 @@ class Level2SpectraApi(object):
                     data = f.read(UPLOAD_CHUNK_SIZE)
                     if not data:
                         break
-                    yield level2spectra_pb2.WriteLevel2spectraReq(record = rec, data = data)
+                    yield level2_pb2.WriteLevel2Req(record = rec, data = data)
         try:
             if not rec.file_path:
                 return Result.error(message="file_path is blank")
@@ -166,7 +170,7 @@ class Level2SpectraApi(object):
 
             resp,_ = self.stub.Write.with_call(stream(rec),metadata = get_auth_headers())
             if resp.success:
-                return Result.ok_data(data=Level2Spectra().from_proto_model(resp.record))
+                return Result.ok_data(data=Level2Data().from_proto_model(resp.record))
             else:
                 return Result.error(message = str(resp.error.detail))
         except grpc.RpcError as e:
