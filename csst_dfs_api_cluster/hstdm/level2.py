@@ -4,7 +4,7 @@ import datetime
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
-from csst_dfs_commons.models.sls import Level2Data
+from csst_dfs_commons.models.hstdm import Level2Data
 from csst_dfs_commons.models.constants import UPLOAD_CHUNK_SIZE
 from csst_dfs_proto.hstdm.level2 import level2_pb2, level2_pb2_grpc
 
@@ -62,7 +62,7 @@ class Level2DataApi(object):
 
         parameter kwargs:
             id : [int] 
-            
+
         return csst_dfs_common.models.Result
         '''
         try:
