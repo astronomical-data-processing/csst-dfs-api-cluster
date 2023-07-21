@@ -229,7 +229,8 @@ class Level1DataApi(object):
             prc_params = get_parameter(kwargs, "prc_params", ""),
             filename = get_parameter(kwargs, "filename", ""),
             file_path = get_parameter(kwargs, "file_path", ""),
-            prc_status = get_parameter(kwargs, "prc_status", -1),
+            qc1_status = get_parameter(kwargs, "qc1_status", 0),
+            prc_status = get_parameter(kwargs, "prc_status", 0),
             prc_time = get_parameter(kwargs, "prc_time", format_datetime(datetime.now())),
             pipeline_id = get_parameter(kwargs, "pipeline_id", ""),
             refs = get_parameter(kwargs, "refs", {})

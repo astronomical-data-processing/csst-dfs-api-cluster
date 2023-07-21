@@ -168,7 +168,7 @@ class Level0DataApi(object):
 
     def write(self, **kwargs):
         ''' insert a level0 data record into database
- 
+
         parameter kwargs:
             obs_id = [str]
             detector_no = [str]
@@ -186,6 +186,7 @@ class Level0DataApi(object):
             obs_type = get_parameter(kwargs, "obs_type"),
             obs_time = get_parameter(kwargs, "obs_time"),
             exp_time = get_parameter(kwargs, "exp_time"),
+            qc0_status = get_parameter(kwargs, "qc0_status", 0),
             detector_status_id = get_parameter(kwargs, "detector_status_id"),
             filename = get_parameter(kwargs, "filename"),
             file_path = get_parameter(kwargs, "file_path")
