@@ -8,9 +8,9 @@ from collections.abc import Iterable
 
 from csst_dfs_commons.models import Result
 from csst_dfs_commons.models.common import from_proto_model_list
-from csst_dfs_commons.models.msc import Level2Record
+from csst_dfs_commons.models.level2 import Level2Record
 from csst_dfs_commons.models.constants import UPLOAD_CHUNK_SIZE
-from csst_dfs_proto.msc.level2 import level2_pb2, level2_pb2_grpc
+from csst_dfs_proto.facility.level2 import level2_pb2, level2_pb2_grpc
 
 from ..common.service import ServiceProxy
 from ..common.utils import *
@@ -28,10 +28,13 @@ class Level2DataApi(object):
         parameter kwargs:
             level0_id: [str]
             level1_id: [int]
+            module_id: [str]
+            brick_id: [int]            
             data_type: [str]
             create_time : (start, end),
             qc2_status : [int],
             prc_status : [int],
+            import_status : [int],
             filename: [str]
             limit: limits returns the number of records,default 0:no-limit
 
@@ -41,11 +44,14 @@ class Level2DataApi(object):
             resp, _ =  self.stub.Find.with_call(level2_pb2.FindLevel2Req(
                 level0_id = get_parameter(kwargs, "level0_id"),
                 level1_id = get_parameter(kwargs, "level1_id"),
+                module_id = get_parameter(kwargs, "module_id"),
+                brick_id = get_parameter(kwargs, "brick_id"),
                 data_type = get_parameter(kwargs, "data_type"),
                 create_time_start = get_parameter(kwargs, "create_time", [None, None])[0],
                 create_time_end = get_parameter(kwargs, "create_time", [None, None])[1],
                 qc2_status = get_parameter(kwargs, "qc2_status", 1024),
                 prc_status = get_parameter(kwargs, "prc_status", 1024),
+                import_status = get_parameter(kwargs, "import_status", 1024),
                 filename = get_parameter(kwargs, "filename"),
                 limit = get_parameter(kwargs, "limit", 0),
                 other_conditions = {"test":"cnlab.test"}
@@ -63,14 +69,7 @@ class Level2DataApi(object):
         ''' retrieve level2catalog records from database
 
         parameter kwargs:
-            brick_ids: list[int]
-            obs_id: [str]
-            detector_no: [str]
-            filter: [str]
-            ra:  [float] in deg
-            dec: [float] in deg
-            radius:  [float] in deg   
-            obs_time: (start, end),
+            sql: [str]
             limit: limits returns the number of records,default 0:no-limit
 
         return: csst_dfs_common.models.Result
@@ -79,24 +78,9 @@ class Level2DataApi(object):
             datas = io.BytesIO()
             totalCount = 0         
             
-            brick_ids = get_parameter(kwargs, "brick_ids", [])
-            if not isinstance(brick_ids,Iterable):
-                brick_ids = [brick_ids]
-
             resps =  self.stub.FindCatalog(level2_pb2.FindLevel2CatalogReq(
-                brick_ids = ",".join([str(i) for i in brick_ids]),
-                obs_id = get_parameter(kwargs, "obs_id", None),
-                detector_no = get_parameter(kwargs, "detector_no", None),
-                filter = get_parameter(kwargs, "filter", None),
-                obs_time_start = get_parameter(kwargs, "obs_time", [None, None])[0],
-                obs_time_end = get_parameter(kwargs, "obs_time", [None, None])[1],
-                ra = get_parameter(kwargs, "ra"),
-                dec = get_parameter(kwargs, "dec"),
-                radius = get_parameter(kwargs, "radius"),
-                minMag = get_parameter(kwargs, "min_mag"),
-                maxMag = get_parameter(kwargs, "max_mag"),
-                limit = get_parameter(kwargs, "limit", 0),
-                columns = ",".join(get_parameter(kwargs, "columns", "*"))
+                sql = get_parameter(kwargs, "sql", None),
+                limit = get_parameter(kwargs, "limit", 0)
             ),metadata = get_auth_headers())
             
             for resp in resps:
@@ -111,59 +95,17 @@ class Level2DataApi(object):
         except grpc.RpcError as e:
             return Result.error(message="%s:%s" % (e.code().value, e.details()))
 
-    def catalog_query_file(self, **kwargs):
-        ''' retrieve level2catalog records from database
-
-        parameter kwargs:
-            brick_ids: list[int]
-            obs_id: [str]
-            detector_no: [str]
-            filter: [str]
-            ra:  [float] in deg
-            dec: [float] in deg
-            radius:  [float] in deg   
-            obs_time: (start, end),
-            limit: limits returns the number of records,default 0:no-limit
-
-        return: csst_dfs_common.models.Result
-        '''
-        try:
-
-            brick_ids = get_parameter(kwargs, "brick_ids", [])
-            if not isinstance(brick_ids, Iterable):
-                brick_ids = [brick_ids]
-
-            resp, _ =  self.stub.FindCatalogFile.with_call(level2_pb2.FindLevel2CatalogReq(
-                brick_ids = ",".join([str(i) for i in brick_ids]),
-                obs_id = get_parameter(kwargs, "obs_id"),
-                detector_no = get_parameter(kwargs, "detector_no"),
-                filter = get_parameter(kwargs, "filter", None),
-                obs_time_start = get_parameter(kwargs, "obs_time", [None, None])[0],
-                obs_time_end = get_parameter(kwargs, "obs_time", [None, None])[1],
-                ra = get_parameter(kwargs, "ra"),
-                dec = get_parameter(kwargs, "dec"),
-                radius = get_parameter(kwargs, "radius"),
-                minMag = get_parameter(kwargs, "min_mag"),
-                maxMag = get_parameter(kwargs, "max_mag"),
-                limit = get_parameter(kwargs, "limit", 0)
-            ),metadata = get_auth_headers())
-
-            if resp.success:
-                return Result.ok_data(data=from_proto_model_list(Level2Record, resp.records)).append("totalCount", resp.totalCount)
-            else:
-                return Result.error(message = str(resp.error.detail))
-
-        except grpc.RpcError as e:
-            return Result.error(message="%s:%s" % (e.code().value, e.details()))
-
     def find_existed_brick_ids(self, **kwargs):
         ''' retrieve existed brick_ids in a single exposure catalog
 
         parameter kwargs:
+            data_type: [str]
         return: csst_dfs_common.models.Result
         '''
         try:
-            resp =  self.stub.FindExistedBricks(level2_pb2.FindExistedBricksReq(),metadata = get_auth_headers())
+            resp =  self.stub.FindExistedBricks(level2_pb2.FindExistedBricksReq(
+                data_type = get_parameter(kwargs, "data_type")
+            ),metadata = get_auth_headers())
 
             if resp.success:
                 return Result.ok_data(data = resp.brick_ids)
@@ -240,22 +182,29 @@ class Level2DataApi(object):
 
     def write(self, **kwargs):
         ''' insert a level2 record into database
- 
+
         parameter kwargs:
             level1_id : [int]
+            brick_id : [int]
+            module_id : [str]
+            object_name: [str]
             data_type : [str]
             filename : [str]
             file_path : [str]            
             prc_status : [int]
             prc_time : [str]
+            pipeline_id : [str]
 
         return csst_dfs_common.models.Result
         '''   
 
         rec = level2_pb2.Level2Record(
             id = 0,
-            level1_id = get_parameter(kwargs, "level1_id"),
-            data_type = get_parameter(kwargs, "data_type"),
+            level1_id = get_parameter(kwargs, "level1_id", 0),
+            brick_id = get_parameter(kwargs, "brick_id", 0),
+            module_id = get_parameter(kwargs, "module_id", ""),
+            data_type = get_parameter(kwargs, "data_type", ""),
+            object_name = get_parameter(kwargs, "object_name", ""),
             filename = get_parameter(kwargs, "filename", ""),
             file_path = get_parameter(kwargs, "file_path", ""),
             qc2_status = get_parameter(kwargs, "qc2_status", 0),
@@ -271,6 +220,10 @@ class Level2DataApi(object):
                         break
                     yield level2_pb2.WriteLevel2Req(record = rec, data = data)
         try:
+            if not rec.module_id:
+                return Result.error(message="module_id is blank")
+            if not rec.data_type:
+                return Result.error(message="data_type is blank")
             if not rec.file_path:
                 return Result.error(message="file_path is blank")
             if not os.path.exists(rec.file_path):
